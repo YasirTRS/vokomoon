@@ -588,7 +588,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="header-inner">
     <div class="logo" onclick="go('home')">
       <div class="logo-icon"><svg viewBox="0 0 24 24" stroke="white" stroke-width="2.2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-      <div><div class="logo-name">Voko<span>moon</span></div><div class="logo-sub">Smart Learning Hub</div></div>
+      <div><div class="logo-name">VoKo<span>Moon</span></div><div class="logo-sub">Smart Learning Hub</div></div>
     </div>
     <div class="h-search">
       <svg width="15" height="15" viewBox="0 0 24 24" stroke="#6B9B82" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

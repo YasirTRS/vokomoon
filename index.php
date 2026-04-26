@@ -741,7 +741,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 
 <!-- ░░ SET PAGE ░░ -->
 <div class="page" id="page-setpage">
-  <div class="seo-bar"><div class="container"><code id="setSeoUrl">Vokomoon.pk/…</code> <span style="color:var(--em);font-weight:600;margin-left:8px;">✓ SEO URL</span></div></div>
+  <div class="seo-bar"><div class="container"><code id="setSeoUrl">Vokomoon.com/…</code> <span style="color:var(--em);font-weight:600;margin-left:8px;">✓ SEO URL</span></div></div>
   <div class="cat-header" style="padding:24px;"><div class="container">
     <div id="setBread" style="font-size:13px;color:#a8d4bc;margin-bottom:6px;"></div>
     <h2 style="font-size:24px;" id="setTitle">Set 1</h2>
@@ -766,7 +766,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 
 <!-- ░░ MCQ DETAIL ░░ -->
 <div class="page" id="page-mcqdetail">
-  <div class="seo-bar"><div class="container"><code id="mcqSeoUrl">Vokomoon.pk/q/…</code></div></div>
+  <div class="seo-bar"><div class="container"><code id="mcqSeoUrl">Vokomoon.com/q/…</code></div></div>
   <div class="detail-wrap">
     <div id="mcqBread" style="font-size:12.5px;color:var(--text3);margin-bottom:10px;"></div>
     <div class="detail-card">
@@ -1206,7 +1206,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
         <div class="adm-f"><label>Featured Emoji / Color</label><input type="text" class="adm-inp" id="artEmoji" placeholder="e.g. 📝 or leave blank"></div>
         <div class="adm-f"><label>⏰ Schedule (blank = now)</label><input type="datetime-local" class="adm-inp" id="artSched"></div>
         <div class="adm-f"><label>URL Slug</label><input type="text" class="adm-inp" id="artSlug" placeholder="my-article-url"></div>
-        <div class="slug-preview">Vokomoon.pk/blog/<span id="slugPrev">my-article-url</span></div>
+        <div class="slug-preview">Vokomoon.com/blog/<span id="slugPrev">my-article-url</span></div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
           <button class="ab ab-o" style="width:100%;justify-content:center;" onclick="saveArtDraft()">💾 Save Draft</button>
           <button class="ab ab-p" style="width:100%;justify-content:center;padding:11px;" onclick="publishArt()">🚀 Publish Now</button>
@@ -1575,7 +1575,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     <div class="footer-col"><h5>Platform</h5><a onclick="go('blog')">Blog</a><a onclick="go('interview')">Interview Prep</a><a onclick="go('ask')">Ask Question</a><a onclick="go('admin')">Admin Panel</a></div>
     <div class="footer-col"><h5>Contact</h5><a href="https://wa.me/923039181337" target="_blank">📱 +92 303 9181337</a><a href="#">About Us</a><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
   </div>
-  <div class="footer-bot"><span>© 2026 Vokomoon.pk — All rights reserved.</span><span>Made with ❤️ in Pakistan 🇵🇰</span></div>
+  <div class="footer-bot"><span>© 2026 Vokomoon.com — All rights reserved.</span><span>Made with ❤️ in Pakistan 🇵🇰</span></div>
 </footer>
 
 <!-- WhatsApp -->
@@ -1946,7 +1946,7 @@ function renderSetPage() {
 
   document.getElementById('setBread').innerHTML = `<span onclick="go('home')" style="color:var(--emlt);cursor:pointer;">Home</span> › <span onclick="openCatPage('${catId}')" style="color:var(--emlt);cursor:pointer;">${cat?.name||''}</span> › ${nm} › Set ${setNum}`;
   document.getElementById('setTitle').textContent = `Set ${setNum} — ${nm} MCQs`;
-  document.getElementById('setSeoUrl').textContent = `Vokomoon.pk/${catId}/${subcatId||'set'}/set-${setNum}`;
+  document.getElementById('setSeoUrl').textContent = `Vokomoon.com/${catId}/${subcatId||'set'}/set-${setNum}`;
 
   // Get ALL MCQs for this category/subcat (including sub-sub categories)
   let allMcqs;
@@ -2226,7 +2226,7 @@ function openMcqDetail(mcqId, idx=0) {
   document.getElementById('mcqBread').innerHTML = `<span onclick="go('home')" style="color:var(--em);cursor:pointer;">Home</span> › <span onclick="openCatPage('${m.cat}')" style="color:var(--em);cursor:pointer;">${cat?.name||m.cat}</span> › Q.${curMcqIdx+1}`;
   document.getElementById('mcqNum').textContent = 'Q.' + (curMcqIdx+1);
   document.getElementById('mcqQ').textContent = m.q;
-  document.getElementById('mcqSeoUrl').textContent = 'Vokomoon.pk/' + m.cat + '/' + m.q.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,'-').substring(0,50);
+  document.getElementById('mcqSeoUrl').textContent = 'Vokomoon.com/' + m.cat + '/' + m.q.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,'-').substring(0,50);
   document.getElementById('mcqProgress').textContent = 'Q.'+(curMcqIdx+1)+' of '+curMcqList.length;
   // Support HTML explanations (rich text) and plain text
   const expEl = document.getElementById('mcqExpTxt');

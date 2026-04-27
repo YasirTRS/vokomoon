@@ -911,7 +911,23 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="lock-title">Admin Panel</div>
   <div class="lock-sub">Enter password to access Vokomoon Admin</div>
   <div class="lock-err" id="lockErr">❌ Wrong password. Try again.</div>
-  <input type="password" class="lock-inp" id="lockInp" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doAdmLogin()">
+  <div style="position: relative;">
+        <input 
+          type="password" 
+          class="lock-inp" 
+          id="lockInp" 
+          placeholder="Enter password…" 
+          onkeydown="if(event.key==='Enter')doAdmLogin()"
+        >
+        
+        <!-- Toggle button -->
+        <span 
+          onclick="togglePassword()" 
+          style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;"
+        >
+          👁️
+        </span>
+      </div>
   <button class="lock-btn" onclick="doAdmLogin()">🔓 Access Admin Panel</button>
 </div>
 </div>
@@ -1814,6 +1830,16 @@ function go(page) {
     refreshPTDropdowns();
     renderMcqTable();
     updateDashStats();
+  }
+}
+
+function togglePassword() {
+  const input = document.getElementById("lockInp");
+  
+  if (input.type === "password") {
+    input.type = "text";
+  } else {
+    input.type = "password";
   }
 }
 

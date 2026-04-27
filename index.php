@@ -1064,10 +1064,6 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div id="mcqBlocks">
     <div class="mcq-blk" id="mcqBlk1">
       <div class="mcq-blk-head"><div class="mcq-blk-num">Question #1</div><button class="ab ab-d" id="mcqRem1" style="display:none;" onclick="remMcqBlk(1)">✕ Remove</button></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="adm-f" style="margin-bottom:0;"><label>Difficulty</label><select class="adm-sel" id="mcqDiff1"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
-        <div class="adm-f" style="margin-bottom:0;"><label>Set #</label><input type="number" class="adm-inp" id="mcqSet1" placeholder="e.g. 1" min="1" value="1"></div>
-      </div>
       <div class="adm-f"><label>Question Text *</label>
         <div class="ed-toolbar" style="margin-bottom:0;border-radius:8px 8px 0 0;">
           <button class="ed-btn" onclick="expCmd('q1','bold')"><b>B</b></button>
@@ -1123,10 +1119,8 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:14px;">
-    <button class="ab" style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--aa);" onclick="addMcqBlk()">＋ Add Another Question</button>
     <div style="display:flex;gap:9px;">
       <button class="ab ab-o" onclick="toast('💾 Saved as Draft!','i')">💾 Save Draft</button>
-      <button class="ab ab-p" onclick="publishMcqs()">🚀 Publish All MCQs to Website</button>
     </div>
   </div>
 </div>

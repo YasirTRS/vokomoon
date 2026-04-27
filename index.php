@@ -597,7 +597,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     <!-- Search Results Dropdown -->
     <div id="searchDrop" style="display:none;position:absolute;top:68px;left:50%;transform:translateX(-50%);width:480px;max-width:90vw;background:white;border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--sh3);z-index:9999;max-height:400px;overflow-y:auto;"></div>
     <div class="h-actions" id="hActions">
-      <button class="btn-admin" onclick="go('admin')"><div class="dot"></div>🛡️ <span class="btn-lbl">Admin Panel</span></button>
+      <!-- <button class="btn-admin" onclick="go('admin')"><div class="dot"></div>🛡️ <span class="btn-lbl">Admin Panel</span></button> -->
       <button class="btn-login" onclick="openAuth('login')">Login</button>
       <button class="btn-reg" onclick="openAuth('register')">Register Free</button>
     </div>

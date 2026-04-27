@@ -2060,7 +2060,6 @@ function renderSetPage() {
         <div class="iq-body-row">
           <div class="iq-opts" id="iqOpts_${m.id}">${optsHtml}</div>
           <div class="iq-side-result" id="iqSide_${m.id}">
-            <div class="iq-result" id="iqRes_${m.id}"></div>
             <div class="iq-exp" id="iqExp_${m.id}">${m.exp ? '<b>📘 Explanation:</b> ' + m.exp : ''}</div>
           </div>
         </div>
@@ -2103,24 +2102,8 @@ function selectIQOpt(mcqId, optIdx, correctIdx) {
     if (card) { card.classList.remove('answered-wrong'); card.classList.add('answered-correct'); }
 
     // Show "Correct!" message for 2 seconds
-    const resEl = document.getElementById('iqRes_' + mcqId);
     const sideEl = document.getElementById('iqSide_' + mcqId);
     if (sideEl) sideEl.classList.add('show');
-    if (resEl) {
-      resEl.className = 'iq-result show res-correct';
-      resEl.innerHTML = '✅ Correct Answer!';
-      setTimeout(() => {
-        resEl.className = 'iq-result';
-        resEl.innerHTML = '';
-        // After hiding message, check if explanation exists — if yes keep panel open
-        const m = curMcqList.find(x => x.id === mcqId);
-        const expEl = document.getElementById('iqExp_' + mcqId);
-        if (!(m && m.exp && m.exp.trim())) {
-          // No explanation — hide side panel too
-          if (sideEl) sideEl.classList.remove('show');
-        }
-      }, 2000);
-    }
 
     // Show explanation only if admin wrote one
     const expEl = document.getElementById('iqExp_' + mcqId);
@@ -2142,18 +2125,8 @@ function selectIQOpt(mcqId, optIdx, correctIdx) {
       optsEl.querySelectorAll('.iq-opt').forEach(o => o.classList.remove('opt-sel','opt-wrong'));
       thisOpt.classList.add('opt-wrong');
       // Show "Wrong!" message briefly
-      const resEl = document.getElementById('iqRes_' + mcqId);
       const sideEl = document.getElementById('iqSide_' + mcqId);
       if (sideEl) sideEl.classList.add('show');
-      if (resEl) {
-        resEl.className = 'iq-result show res-wrong';
-        resEl.innerHTML = '❌ Wrong Answer!';
-      }
-      setTimeout(() => {
-        thisOpt.classList.remove('opt-wrong');
-        if (resEl) { resEl.className = 'iq-result'; resEl.innerHTML = ''; }
-        if (sideEl) sideEl.classList.remove('show');
-      }, 2000);
     }
   }
 }

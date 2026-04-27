@@ -542,6 +542,7 @@ textarea.adm-inp{resize:vertical;min-height:80px}
 nav::-webkit-scrollbar{display:none}
 nav{-ms-overflow-style:none;scrollbar-width:none;}
 #sectionTabs::-webkit-scrollbar{display:none;}
+#sectionTabs2::-webkit-scrollbar{display:none;}
 
 /* PUBLISH TARGET BOXES */
 .pt-box { transition:.2s; }
@@ -760,6 +761,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
       
       <button class="btn btn-o" onclick="resetSetAnswers()" id="setResetBtn" style="padding:12px 24px;font-size:15px;display:none;margin-left:10px;">🔄 Try Again</button>
     </div>
+    <div id="sectionTabs2" style="display:flex;gap:4px;padding:10px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;"></div>
     <div class="pagination" id="setPag"></div>
   </div>
 </div>
@@ -2005,18 +2007,25 @@ function renderSetPage() {
   const totalSets = Math.max(Math.ceil(totalMcqs / mcqsPerSet2), 1);
   // How many sections are filled in this set
   const thisSectionCount = Math.max(Math.ceil(setMcqs2.length / perSection), setMcqs2.length > 0 ? 1 : 0);
-  document.getElementById('setSubt').textContent = setMcqs2.length + ' MCQs in this set · ' + thisSectionCount + ' sections · 10 per section';
+  document.getElementById('setSubt').textContent = setMcqs2.length + ' MCQs in this set · ' + thisSectionCount + ' pages · 10 per section';
 
   // Build section tabs (only for this set's sections)
   const tabsEl = document.getElementById('sectionTabs');
+  const tabsEl2 = document.getElementById('sectionTabs2');
   if (tabsEl) {
     tabsEl.innerHTML = '';
+    tabsEl2.innerHTML = '';
     for (let s = 1; s <= thisSectionCount; s++) {
       const btn = document.createElement('button');
       btn.className = 'sec-tab' + (s === curSetSection ? ' active' : '');
-      btn.textContent = 'Section ' + s;
+      btn.textContent = 'Page ' + s;
       btn.onclick = (function(sec){ return function(){ goToSection(sec); }; })(s);
+      const btn2 = document.createElement('button');
+      btn2.className = 'sec-tab' + (s === curSetSection ? ' active' : '');
+      btn2.textContent = 'Page ' + s;
+      btn2.onclick = (function(sec){ return function(){ goToSection(sec); }; })(s);
       tabsEl.appendChild(btn);
+      tabsEl2.appendChild(btn2);
     }
   }
 

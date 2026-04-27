@@ -1106,6 +1106,8 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
           <button class="ed-btn" onclick="expCmd(1,'insertUnorderedList')">• List</button>
           <button class="ed-btn" onclick="expCmd(1,'insertOrderedList')">1. List</button>
           <div class="ed-sep"></div>
+          <button class="ed-btn" onclick="insertTableInExp(1)">📊 Table</button>
+          <button class="ed-btn" onclick="applyTextColorToExp(1)">🎨 Color</button>
           <button class="ed-btn" onclick="expCmd(1,'undo')">↩</button>
           <button class="ed-btn" onclick="expCmd(1,'redo')">↪</button>
         </div>
@@ -4150,6 +4152,64 @@ function expCmd(n, cmd, val) {
   if (!el) return;
   el.focus();
   document.execCommand(cmd, false, val||null);
+}
+
+// Insert a table at cursor position
+function insertTableInExp(n) {
+  let rows = prompt('Number of rows (1-10):', '3');
+  if (!rows) return;
+  rows = parseInt(rows);
+  if (isNaN(rows) || rows < 1) rows = 1;
+  if (rows > 10) rows = 10;
+
+  let cols = prompt('Number of columns (1-10):', '3');
+  if (!cols) return;
+  cols = parseInt(cols);
+  if (isNaN(cols) || cols < 1) cols = 1;
+  if (cols > 10) cols = 10;
+
+  let tableHtml = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; margin:10px 0; width:100%;">';
+  for (let i = 0; i < rows; i++) {
+    tableHtml += '<tr>';
+    for (let j = 0; j < cols; j++) {
+      tableHtml += '<td style="border:1px solid #ccc; padding:8px;">&nbsp;</td>';
+    }
+    tableHtml += '</tr>';
+  }
+  tableHtml += '</table>';
+
+  const editor = document.getElementById('mcqExp' + n);
+  if (!editor) return;
+  editor.focus();
+
+  // Use execCommand with insertHTML (supported in modern browsers)
+  if (document.queryCommandSupported('insertHTML')) {
+    document.execCommand('insertHTML', false, tableHtml);
+  } else {
+    // Fallback: insert at cursor using selection range
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const fragment = range.createContextualFragment(tableHtml);
+      range.insertNode(fragment);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      editor.innerHTML += tableHtml;
+    }
+  }
+}
+
+// Apply text color to selected text (or at cursor)
+function applyTextColorToExp(n) {
+  let color = prompt('Enter color (name or hex):', '#22C97B');
+  if (!color) return;
+  const editor = document.getElementById('mcqExp' + n);
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('foreColor', false, color);
 }
 
 /* ══════ ARTICLE IMAGE HANDLER ══════ */

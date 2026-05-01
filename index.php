@@ -617,6 +617,25 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   background: rgba(255,255,255,0.1);
 }
 
+@media(max-width:900px){
+  .set-page-grid { grid-template-columns: 1fr !important; }
+}
+
+.category-tree {
+  font-size: 14px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 6px 12px 12px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.cat-name-link {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text2);
+  transition: 0.1s;
+}
 </style>
 </head>
 <body>
@@ -816,14 +835,22 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     </div>
   </div>
   <div class="container" style="padding-top:22px;padding-bottom:40px;">
-    <div id="setMcqList"></div>
-    <!-- Submit Button -->
-    <div id="setSubmitWrap" style="display:none;margin-top:20px;text-align:center;">
-      
-      <button class="btn btn-o" onclick="resetSetAnswers()" id="setResetBtn" style="padding:12px 24px;font-size:15px;display:none;margin-left:10px;">🔄 Try Again</button>
+    <div class="set-page-grid" style="display:grid;grid-template-columns:1fr 280px;gap:28px;">
+      <!-- left side: MCQs, buttons, pagination -->
+      <div class="set-left">
+        <div id="setMcqList"></div>
+        <div id="setSubmitWrap" style="display:none;margin-top:20px;text-align:center;">
+          <button class="btn btn-o" onclick="resetSetAnswers()" id="setResetBtn" style="padding:12px 24px;font-size:15px;display:none;margin-left:10px;">🔄 Try Again</button>
+        </div>
+        <div id="sectionTabs2" style="display:flex;gap:4px;padding:10px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;"></div>
+        <div class="pagination" id="setPag"></div>
+      </div>
+      <!-- right side: category browser -->
+      <div class="set-right">
+        <div class="set-categories-header" style="font-weight:800;font-size:16px;margin-bottom:12px;">📚 Categories</div>
+        <div id="setCategoriesSidebar"></div>
+      </div>
     </div>
-    <div id="sectionTabs2" style="display:flex;gap:4px;padding:10px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;"></div>
-    <div class="pagination" id="setPag"></div>
   </div>
 </div>
 
@@ -2130,6 +2157,7 @@ function renderSetPage() {
   }
   document.getElementById('setPag').innerHTML = '';
   go('setpage');
+  renderSetCategorySidebar();
 }
 
 function goToSection(sec) {
@@ -4799,6 +4827,128 @@ function delAllContent(type, id) {
   saveDB();
   renderAllContent();
   toast('🗑️ Delete ho gaya!','e');
+}
+
+function renderSetCategorySidebar() {
+  const container = document.getElementById('setCategoriesSidebar');
+  if (!container) return;
+
+  // Helper: count MCQs for a category (main, sub, sub-sub)
+  function countMcqs(catId, type, parentId = null) {
+    if (type === 'main') {
+      const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
+      const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
+      const allIds = [catId, ...subIds, ...sscIds];
+      return DB.mcqs.filter(m => allIds.includes(m.cat)).length;
+    } else if (type === 'sub') {
+      const sscIds = DB.subsubcats.filter(x => x.parent === catId).map(x => x.id);
+      return DB.mcqs.filter(m => m.cat === catId || sscIds.includes(m.cat)).length;
+    } else { // sub-sub
+      return DB.mcqs.filter(m => m.cat === catId).length;
+    }
+  }
+
+  // Determine active IDs for highlighting
+  const activeMain = curSetCatId;
+  const activeSub = curSetSubId;
+  const activeSSC = (() => {
+    const ssc = DB.subsubcats.find(x => x.id === curSetSubId);
+    return ssc ? curSetSubId : null;
+  })();
+
+  let html = '<div class="category-tree">';
+  for (const cat of DB.cats) {
+    const subcats = DB.subcats.filter(s => s.parent === cat.id);
+    const mcqCount = countMcqs(cat.id, 'main');
+    const isActiveMain = (activeMain === cat.id && !activeSub && !activeSSC);
+    html += `
+      <div class="cat-tree-item main-cat" data-main-id="${cat.id}">
+        <div class="cat-tree-row">
+          <span class="cat-toggle" data-type="main" data-id="${cat.id}">➕</span>
+          <span class="cat-name-link ${isActiveMain ? 'active-cat' : ''}" data-type="main" data-id="${cat.id}">${cat.icon} ${cat.name}</span>
+          <span class="cat-count">(${mcqCount})</span>
+        </div>
+        <div class="cat-children" data-parent="${cat.id}" style="display:none;">`;
+    for (const sub of subcats) {
+      const subMcqCount = countMcqs(sub.id, 'sub');
+      const subsubs = DB.subsubcats.filter(x => x.parent === sub.id);
+      const hasSubsub = subsubs.length > 0;
+      const isActiveSub = (activeSub === sub.id && !activeSSC);
+      html += `
+        <div class="cat-tree-item sub-cat" data-sub-id="${sub.id}" style="margin-left:20px;">
+          <div class="cat-tree-row">
+            ${hasSubsub ? `<span class="cat-toggle" data-type="sub" data-id="${sub.id}" data-parent-main="${cat.id}">➕</span>` : '<span style="width:20px;"></span>'}
+            <span class="cat-name-link ${isActiveSub ? 'active-cat' : ''}" data-type="sub" data-main="${cat.id}" data-sub="${sub.id}">📌 ${sub.name}</span>
+            <span class="cat-count">(${subMcqCount})</span>
+          </div>
+          <div class="cat-children" data-parent-sub="${sub.id}" style="display:none; margin-left:20px;">`;
+      for (const ssc of subsubs) {
+        const sscMcqCount = countMcqs(ssc.id, 'subsub');
+        const isActiveSSC = (activeSSC === ssc.id);
+        html += `
+          <div class="cat-tree-item subsub-cat" data-ssc-id="${ssc.id}" style="margin-left:20px;">
+            <div class="cat-tree-row">
+              <span style="width:20px;"></span>
+              <span class="cat-name-link ${isActiveSSC ? 'active-cat' : ''}" data-type="subsub" data-main="${cat.id}" data-sub="${sub.id}" data-ssc="${ssc.id}">🔹 ${ssc.name}</span>
+              <span class="cat-count">(${sscMcqCount})</span>
+            </div>
+          </div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+
+  // ----- attach event listeners -----
+  // toggle for main categories
+  document.querySelectorAll('.cat-toggle[data-type="main"]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const mainId = btn.dataset.id;
+      const childrenDiv = document.querySelector(`.cat-children[data-parent="${mainId}"]`);
+      if (childrenDiv) {
+        const isVisible = childrenDiv.style.display !== 'none';
+        childrenDiv.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? '➕' : '➖';
+      }
+    };
+  });
+  // toggle for sub categories
+  document.querySelectorAll('.cat-toggle[data-type="sub"]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const subId = btn.dataset.id;
+      const childrenDiv = document.querySelector(`.cat-children[data-parent-sub="${subId}"]`);
+      if (childrenDiv) {
+        const isVisible = childrenDiv.style.display !== 'none';
+        childrenDiv.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? '➕' : '➖';
+      }
+    };
+  });
+
+  // navigation on category name clicks
+  document.querySelectorAll('.cat-name-link').forEach(link => {
+    link.onclick = (e) => {
+      e.stopPropagation();
+      const type = link.dataset.type;
+      if (type === 'main') {
+        const mainId = link.dataset.id;
+        openCatPage(mainId);
+      } else if (type === 'sub') {
+        const mainId = link.dataset.main;
+        const subId = link.dataset.sub;
+        openSetPage(mainId, subId, 1);
+      } else if (type === 'subsub') {
+        const mainId = link.dataset.main;
+        const subId = link.dataset.sub;
+        const sscId = link.dataset.ssc;
+        openSubSubCatPage(mainId, subId, sscId);
+      }
+    };
+  });
 }
 
 </script>

@@ -60,7 +60,7 @@ header{background:var(--white);box-shadow:var(--sh);position:sticky;top:0;z-inde
 
 /* NAV */
 nav{background:var(--forest);border-bottom:3px solid var(--em)}
-.nav-inner{max-width:100%;padding:0 24px;display:flex;align-items:center;flex-wrap:nowrap;gap:0;overflow-x:auto;}
+.nav-inner{max-width:100%;padding:0 24px;display:flex;align-items:center;flex-wrap:nowrap;gap:0;}
 .nav-btn{color:#c8e8d8;font-size:13px;font-weight:500;padding:12px 14px;display:flex;align-items:center;gap:5px;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;cursor:pointer;transition:.2s;background:none;border-left:none;border-right:none;border-top:none;font-family:"DM Sans",sans-serif}
 .nav-btn:hover{color:var(--emlt);border-bottom-color:var(--gold)}
 .nav-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
@@ -556,6 +556,67 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 .pg-btn:hover { border-color:var(--em); color:var(--em); }
 .pg-btn.active { background:var(--em); border-color:var(--em); color:white; font-weight:800; }
 .pg-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* nav dropdown styles */
+.nav-item {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--forest);
+  min-width: 200px;
+  border-radius: 12px;
+  box-shadow: var(--sh2);
+  z-index: 1050;
+  display: none;
+  padding: 8px 0;
+}
+.nav-item:hover .dropdown-content {
+  display: block;
+}
+.dropdown-item {
+  display: block;
+  padding: 8px 18px;
+  color: #c8e8d8;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dropdown-item:hover {
+  background: rgba(34, 201, 123, 0.15);
+  color: var(--emlt);
+}
+.sub-dropdown {
+  position: relative;
+}
+.sub-dropdown-content {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: var(--forest2);
+  min-width: 200px;
+  border-radius: 12px;
+  box-shadow: var(--sh2);
+  display: none;
+  padding: 6px 0;
+}
+.sub-dropdown:hover .sub-dropdown-content {
+  display: block;
+}
+/* adjust for RTL or left-edge issues */
+.sub-dropdown-content .dropdown-item {
+  color: #e0f0e8;
+}
+.sub-dropdown-content .dropdown-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
 </style>
 </head>
 <body>
@@ -606,7 +667,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 </header>
 
 <!-- NAV -->
-<nav style="overflow-x:auto;"><div class="nav-inner" id="mainNav">
+<nav><div class="nav-inner" id="mainNav">
   <button class="nav-btn active" id="navHome" onclick="go('home')">🏠 Home</button>
   <!-- JS will inject category buttons here with class dyn-nav -->
   <button class="nav-btn" id="navBlog" onclick="go('blog')">✍️ Blog</button>
@@ -2401,16 +2462,78 @@ function openBlogPost(id) {
 function refreshNavCats() {
   const nav = document.getElementById('mainNav');
   if (!nav) return;
-  nav.querySelectorAll('.dyn-nav').forEach(b => b.remove());
+  nav.querySelectorAll('.dyn-nav').forEach(el => el.remove());  // remove old dynamic items
+
   const blogBtn = document.getElementById('navBlog');
   if (!blogBtn) return;
-  DB.cats.filter(c => c.show === true || c.show === 'yes').forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn dyn-nav';
-    btn.textContent = c.icon + ' ' + c.name;
-    btn.onclick = () => openCatPage(c.id);
-    blogBtn.insertAdjacentElement('beforebegin', btn);
-  });
+
+  // Build tree of subcategories per main category
+  const mainCats = DB.cats.filter(c => c.show === true || c.show === 'yes');
+  for (const cat of mainCats) {
+    // Subcategories of this main category
+    const subCats = DB.subcats.filter(sub => sub.parent === cat.id);
+    // Create container <div class="nav-item dyn-nav">
+    const container = document.createElement('div');
+    container.className = 'nav-item dyn-nav';
+
+    // Main button (same as before)
+    const mainBtn = document.createElement('button');
+    mainBtn.className = 'nav-btn';
+    mainBtn.textContent = cat.icon + ' ' + cat.name;
+    mainBtn.onclick = () => openCatPage(cat.id);
+    container.appendChild(mainBtn);
+
+    if (subCats.length) {
+      const dropdownDiv = document.createElement('div');
+      dropdownDiv.className = 'dropdown-content';
+
+      for (const sub of subCats) {
+        // Check if this subcategory has sub-subcategories
+        const subsubs = DB.subsubcats.filter(ssc => ssc.parent === sub.id);
+        if (subsubs.length) {
+          // Nested dropdown (sub-dropdown)
+          const subWrap = document.createElement('div');
+          subWrap.className = 'sub-dropdown';
+
+          const subLink = document.createElement('a');
+          subLink.className = 'dropdown-item';
+          subLink.textContent = sub.name;
+          subLink.onclick = (e) => {
+            e.preventDefault();
+            openSetPage(cat.id, sub.id, 1);
+          };
+          subWrap.appendChild(subLink);
+
+          const subsubDiv = document.createElement('div');
+          subsubDiv.className = 'sub-dropdown-content';
+          for (const ssc of subsubs) {
+            const sscLink = document.createElement('a');
+            sscLink.className = 'dropdown-item';
+            sscLink.textContent = ssc.name;
+            sscLink.onclick = (e) => {
+              e.preventDefault();
+              openSubSubCatPage(cat.id, sub.id, ssc.id);
+            };
+            subsubDiv.appendChild(sscLink);
+          }
+          subWrap.appendChild(subsubDiv);
+          dropdownDiv.appendChild(subWrap);
+        } else {
+          // Simple subcategory link
+          const subLink = document.createElement('a');
+          subLink.className = 'dropdown-item';
+          subLink.textContent = sub.name;
+          subLink.onclick = (e) => {
+            e.preventDefault();
+            openSetPage(cat.id, sub.id, 1);
+          };
+          dropdownDiv.appendChild(subLink);
+        }
+      }
+      container.appendChild(dropdownDiv);
+    }
+    blogBtn.insertAdjacentElement('beforebegin', container);
+  }
 }
 
 function refreshFooterCats() {

@@ -1980,6 +1980,19 @@ function go(page) {
   }
 }
 
+// Returns true if MCQ is published (no schedule or schedule <= current time)
+function isMcqPublished(mcq) {
+  if (!mcq.scheduled_at) return true;
+  const scheduleTime = new Date(mcq.scheduled_at).getTime();
+  const now = new Date().getTime();
+  return scheduleTime <= now;
+}
+
+// Filter an array of MCQs to only those published
+function getPublishedMcqs(mcqs) {
+  return mcqs.filter(isMcqPublished);
+}
+
 function togglePassword() {
   const input = document.getElementById("lockInp");
   
@@ -2000,7 +2013,8 @@ function openCatPage(catId) {
   // Real MCQ count — include sub-cat and sub-sub-cat MCQs (fix: ander publish hon)
   const _subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
   const _sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-  const realMcqs = DB.mcqs.filter(m => m.cat === catId || _subIds.includes(m.cat) || _sscIds.includes(m.cat));
+  const realMcqsAll = DB.mcqs.filter(m => m.cat === catId || _subIds.includes(m.cat) || _sscIds.includes(m.cat));
+  const realMcqs = getPublishedMcqs(realMcqsAll);
   const realCount = realMcqs.length;
   document.getElementById('cpMcqCnt').textContent = '📦 ' + realCount.toLocaleString() + ' MCQs';
 
@@ -2009,11 +2023,12 @@ function openCatPage(catId) {
   subEl.innerHTML = subs.length ? subs.map(s => {
     // Count: sub-cat direct MCQs + all sub-sub-cat MCQs under it
     const _sscIdsUnderSub = DB.subsubcats.filter(x => x.parent === s.id).map(x => x.id);
-    const subRealMcqs = DB.mcqs.filter(m => m.cat === s.id || _sscIdsUnderSub.includes(m.cat)).length;
+    const subAllMcqs = DB.mcqs.filter(m => m.cat === s.id || _sscIdsUnderSub.includes(m.cat));
+    const subRealMcqs = getPublishedMcqs(subAllMcqs).length;
     // Get sub-sub-cats under this sub
     const sscs = DB.subsubcats.filter(x => x.parent === s.id);
     const sscHtml = sscs.length ? `<div style="padding:0 18px 10px;display:flex;flex-wrap:wrap;gap:6px;">${sscs.map(x=>{
-      const xMcqs = DB.mcqs.filter(m => m.cat === x.id).length;
+      const xMcqs = getPublishedMcqs(DB.mcqs.filter(m => m.cat === x.id)).length;
       return `<span style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--forest2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openSubSubCatPage('${catId}','${s.id}','${x.id}')">${x.name} (${xMcqs})</span>`;
     }).join('')}</div>` : '';
     return `<div>
@@ -2125,22 +2140,20 @@ function renderSetPage() {
   document.getElementById('setSeoUrl').textContent = `Vokomoon.com/${catId}/${subcatId||'set'}/set-${setNum}`;
 
   // Get ALL MCQs for this category/subcat (including sub-sub categories)
-  let allMcqs;
+  let allMcqsRaw;
   if (subcatId) {
     if (ssc) {
-      // It's a sub-sub-cat — only its MCQs
-      allMcqs = DB.mcqs.filter(m => m.cat === subcatId);
+      allMcqsRaw = DB.mcqs.filter(m => m.cat === subcatId);
     } else {
-      // It's a sub-cat — include sub-cat MCQs + any sub-sub-cat MCQs under it
       const sscIds = DB.subsubcats.filter(x => x.parent === subcatId).map(x => x.id);
-      allMcqs = DB.mcqs.filter(m => m.cat === subcatId || sscIds.includes(m.cat));
+      allMcqsRaw = DB.mcqs.filter(m => m.cat === subcatId || sscIds.includes(m.cat));
     }
   } else {
-    // Main cat — include direct MCQs + sub-cat MCQs + sub-sub-cat MCQs
     const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
     const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-    allMcqs = DB.mcqs.filter(m => m.cat === catId || subIds.includes(m.cat) || sscIds.includes(m.cat));
+    allMcqsRaw = DB.mcqs.filter(m => m.cat === catId || subIds.includes(m.cat) || sscIds.includes(m.cat));
   }
+  const allMcqs = getPublishedMcqs(allMcqsRaw);
   // 1 Set = 100 MCQs (10 sections x 10 MCQs)
   const mcqsPerSet2 = 100;
   const perSection = 10;
@@ -2458,7 +2471,8 @@ function renderHomeCats() {
 function renderHomeMcqs() {
   const el = document.getElementById('homeMcqList');
   if (!el) return;
-  const sorted = [...DB.mcqs].sort((a,b) => (b.ts||b.id||0) - (a.ts||a.id||0));
+  const published = getPublishedMcqs(DB.mcqs);
+  const sorted = [...published].sort((a,b) => (b.ts||b.id||0) - (a.ts||a.id||0));
   const all = sorted.slice(0,6);
   if (!all.length) { el.innerHTML = '<div>No MCQs yet.</div>'; return; }
   el.innerHTML = all.map((m,i) => {
@@ -2480,7 +2494,8 @@ function renderHomeMcqs() {
 }
 
 function openMcqFromHome(idx) {
-  const sorted = [...DB.mcqs].sort((a,b) => {
+  const published = getPublishedMcqs(DB.mcqs);
+  const sorted = [...published].sort((a,b) => {
     const ta = a.ts || a.id || 0; const tb = b.ts || b.id || 0;
     return String(tb).localeCompare(String(ta));
   });
@@ -2997,8 +3012,9 @@ function publishSingleMcq(n) {
   const expEl = document.getElementById('mcqExp'+n);
   const exp = expEl ? (expEl.innerHTML || '') : '';
   const set = parseInt(document.getElementById('mcqSet'+n)?.value)||1;
+  const scheduledAt = document.getElementById('mcqSched'+n)?.value || null;
   const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
+  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
   updateMcqCounts(pt);
   renderHomeMcqs(); renderHomeCats(); renderMcqTable(); updateDashStats();
   addToAllContent('mcq','❓','1 MCQ — '+pt.catName);
@@ -3028,8 +3044,9 @@ function publishSingleMcqFirst() {
   const expEl = document.getElementById('mcqExp1');
   const exp = expEl ? (expEl.innerHTML || '') : '';
   const set = parseInt(document.getElementById('mcqSet1')?.value)||1;
+  const scheduledAt = document.getElementById('mcqSched1')?.value || null;
   const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
+  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
   updateMcqCounts(pt);
   renderHomeMcqs(); renderHomeCats(); renderMcqTable(); updateDashStats();
   addToAllContent('mcq','❓','1 MCQ — '+pt.catName);
@@ -3306,8 +3323,9 @@ function publishMcqs() {
     const expEl = document.getElementById('mcqExp'+i);
     const exp = expEl ? (expEl.innerHTML || expEl.value || '') : '';
     const set = parseInt(document.getElementById('mcqSet'+i)?.value)||1;
+    const scheduledAt = document.getElementById('mcqSched'+i)?.value || null;
     const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-    DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml || q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
+    DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml || q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
     // Update cat MCQ count
     updateMcqCounts(pt);
     count++;
@@ -3347,8 +3365,14 @@ function renderMcqTable() {
       <td class="td-main" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.q.substring(0,55)}…</td>
       <td><span class="chip-a">${catName}</span></td>
       <td><span class="diff-${m.diff==='Hard'?'h':m.diff==='Medium'?'m':'e'}">${m.diff}</span></td>
-      <td><span class="st st-pub">Published</span></td>
-      <td><input type="datetime-local" class="sched-inp"></td>
+      <td>
+        ${!m.scheduled_at || new Date(m.scheduled_at) <= new Date() 
+          ? '<span class="st st-pub">Published</span>' 
+          : '<span class="st st-sch">Scheduled</span>'}
+      </td>
+      <td style="font-size:11px;">
+        ${m.scheduled_at ? new Date(m.scheduled_at).toLocaleString() : '—'}
+      </td>
       <td><div style="display:flex;gap:5px;">
         <button class="ab ab-o" style="padding:4px 9px;font-size:11px;" onclick="openEditModal('mcq','${m.id}')">✏️ Edit</button>
         <button class="ab ab-d" style="padding:4px 9px;font-size:11px;" onclick="delMcq('${m.id}',this)">Del</button>
@@ -4202,7 +4226,7 @@ function liveSearch(q) {
   if (!q || q.length < 2) { drop.style.display = 'none'; return; }
   const results = [];
   // Search MCQs
-  DB.mcqs.filter(m => m.q.toLowerCase().includes(q)).slice(0,5).forEach(m => {
+  getPublishedMcqs(DB.mcqs).filter(m => m.q.toLowerCase().includes(q)).slice(0,5).forEach(m => {
     const cat = DB.cats.find(c => c.id === m.cat);
     results.push({ type:'mcq', icon:'❓', bg:'rgba(34,201,123,.1)', title: m.q.substring(0,70)+(m.q.length>70?'…':''), sub: (cat?.name||m.cat)+' · '+m.diff, action:`navigateTo('mcq', { mcq: '${m.id}' }); return false;` });
   });
@@ -4654,7 +4678,7 @@ function openEditModal(type, id) {
         <input type="radio" name="ewCorr" value="${i}" ${i===item.correct?'checked':''} style="width:18px;height:18px;accent-color:#22C97B;cursor:pointer;flex-shrink:0;">
       </div>`).join('');
     html = `<label style="${L}">Category</label><select id="ew1" style="${S}cursor:pointer;"><option value="">Select…</option>${catO}</select>
-<label style="${L}">Difficulty</label><select id="ew2" style="${S}cursor:pointer;"><option ${item.diff==='Easy'?'selected':''}>Easy</option><option ${item.diff==='Medium'?'selected':''}>Medium</option><option ${item.diff==='Hard'?'selected':''}>Hard</option></select>
+<label style="${L}">Schedule (Optional)</label><input type="datetime-local" id="ewSched" style="${S}" value="${item.scheduled_at ? item.scheduled_at.slice(0,16) : ''}">
 <label style="${L}">Question *</label><textarea id="ew3" style="${S}resize:vertical;min-height:80px;">${eh(item.q||'')}</textarea>
 <label style="${L}">Options <span style="font-weight:400;color:#6b9b82;">(⭕ = Correct Answer)</span></label>${opts}
 <label style="${L}">Explanation</label><textarea id="ew4" style="${S}resize:vertical;min-height:60px;">${eh(item.exp||'')}</textarea>`;
@@ -4733,6 +4757,13 @@ function saveEW() {
   } else if (type === 'mcq') {
     const q=document.getElementById('ew3')?.value.trim(); if(!q){toast('⚠️ Question likhein!','e');return;}
     const catName=document.getElementById('ew1')?.value;
+    const schedValue = document.getElementById('ewSched')?.value;
+    if (schedValue) {
+      // Convert to proper datetime format (Y-m-d\TH:i)
+      item.scheduled_at = schedValue;
+    } else {
+      item.scheduled_at = null;
+    }
     const catObj=DB.cats.find(c=>c.name===catName);
     item.q=q; item.catName=catName; item.cat=catObj?catObj.id:item.cat;
     item.diff=document.getElementById('ew2')?.value||item.diff;

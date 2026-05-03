@@ -725,6 +725,16 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     </div>
   </div>
 
+  <!-- Departments Section -->
+  <div id="homeDeptSec" style="display:none; background:var(--white); border-bottom:1.5px solid var(--border); padding:28px 0;">
+    <div class="container">
+      <div class="sec-row">
+        <div><div class="sec-title">All Departments</div><div style="font-size:13px;color:var(--text3);margin-top:3px;">Specialized subject departments</div></div>
+      </div>
+      <div class="cat-grid" id="homeDeptGrid"><!-- JS will populate --></div>
+    </div>
+  </div>
+
   
   <!-- PDF published on homepage -->
   <div id="homePdfSec" style="display:none;background:var(--white);border-bottom:1.5px solid var(--border);padding:28px 0;">
@@ -1490,6 +1500,12 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
       <div class="adm-form-title">➕ Add Main Category</div>
       <div class="adm-form-sub">Shows on homepage + nav bar</div>
       <div class="adm-f"><label>Category Name *</label><input type="text" class="adm-inp" id="newCatName" placeholder="e.g. Economics, Urdu, Islamiat…"></div>
+      <div class="adm-f">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="newCatDepartment" value="yes"> 
+          <span>📁 Is Department? (Show in “All Departments” section on homepage)</span>
+        </label>
+      </div>
       <div class="adm-f"><label>Background Color</label><input type="color" class="adm-inp" id="newCatColor" value="#e8f5ee" style="height:42px;cursor:pointer;"></div>
       <div class="adm-f"><label>Show on Homepage?</label><select class="adm-sel" id="newCatShow"><option value="yes">✅ Yes — Show on homepage</option><option value="no">🔒 No — Hidden from homepage</option></select></div>
       <button class="ab ab-p" style="width:100%;padding:13px;font-size:15px;font-weight:800;justify-content:center;margin-top:6px;" onclick="addCategory()">✅ Add Category</button>
@@ -1778,16 +1794,16 @@ const DB = {
   questions: [],
   savedItems: [],
   cats: [
-    {id:'english',    name:'English',         icon:'📗', color:'#e8f5ee', show:true,  mcqs:0},
-    {id:'maths',      name:'Mathematics',     icon:'🔢', color:'#fff3e0', show:true,  mcqs:0},
-    {id:'science',    name:'General Science', icon:'🔬', color:'#e3f2fd', show:true,  mcqs:0},
-    {id:'computer',   name:'Computer Science',icon:'💻', color:'#f3e5f5', show:true,  mcqs:0},
-    {id:'gk',         name:'General Knowledge',icon:'🌍',color:'#fce4ec', show:true,  mcqs:0},
-    {id:'pakstudies', name:'Pakistan Studies', icon:'📜', color:'#e8f5e9', show:true,  mcqs:0},
-    {id:'chemistry',  name:'Chemistry',        icon:'⚗️', color:'#fff8e1', show:true,  mcqs:0},
-    {id:'biology',    name:'Biology',          icon:'🧬', color:'#e0f7fa', show:true,  mcqs:0},
-    {id:'islamic',    name:'Islamic Studies',  icon:'☪️', color:'#fbe9e7', show:true,  mcqs:0},
-    {id:'current',    name:'Current Affairs',  icon:'📰', color:'#ede7f6', show:true,  mcqs:0}
+    {id:'english',    name:'English',         icon:'📗', color:'#e8f5ee', show:true,  mcqs:0, is_department:false},
+    {id:'maths',      name:'Mathematics',     icon:'🔢', color:'#fff3e0', show:true,  mcqs:0, is_department:false},
+    {id:'science',    name:'General Science', icon:'🔬', color:'#e3f2fd', show:true,  mcqs:0, is_department:false},
+    {id:'computer',   name:'Computer Science',icon:'💻', color:'#f3e5f5', show:true,  mcqs:0, is_department:false},
+    {id:'gk',         name:'General Knowledge',icon:'🌍',color:'#fce4ec', show:true,  mcqs:0, is_department:false},
+    {id:'pakstudies', name:'Pakistan Studies', icon:'📜', color:'#e8f5e9', show:true,  mcqs:0, is_department:false},
+    {id:'chemistry',  name:'Chemistry',        icon:'⚗️', color:'#fff8e1', show:true,  mcqs:0, is_department:false},
+    {id:'biology',    name:'Biology',          icon:'🧬', color:'#e0f7fa', show:true,  mcqs:0, is_department:false},
+    {id:'islamic',    name:'Islamic Studies',  icon:'☪️', color:'#fbe9e7', show:true,  mcqs:0, is_department:false},
+    {id:'current',    name:'Current Affairs',  icon:'📰', color:'#ede7f6', show:true,  mcqs:0, is_department:false}
   ],
   subcats: [
     {id:'tenses',  parent:'english',   name:'Tenses',         mcqs:0},
@@ -1850,7 +1866,10 @@ async function loadDB() {
     if (d.videos)       DB.videos       = d.videos;
     if (d.notes)        DB.notes        = d.notes;
     if (d.questions)    DB.questions    = d.questions;
-    if (d.cats)         DB.cats         = d.cats;
+    if (d.cats) {
+      d.cats.forEach(c => { if (c.is_department === undefined) c.is_department = false; });
+      DB.cats = d.cats;
+    }
     if (d.subcats)      DB.subcats      = d.subcats;
     if (d.subsubcats)   DB.subsubcats   = d.subsubcats;
     if (d.users)        DB.users        = d.users;
@@ -2445,26 +2464,55 @@ function mcqPrev() { if(curMcqIdx>0){curMcqIdx--;openMcqDetail(curMcqList[curMcq
 
 /* ══════ HOME RENDERS ══════ */
 function renderHomeCats() {
-  const el = document.getElementById('homeCatGrid');
-  if (!el) return;
-  const shown = DB.cats.filter(c => c.show === true || c.show === 'yes');
-  if (!shown.length) {
-    el.innerHTML = '<div style="padding:20px;">Koi category nahi.</div>';
-    return;
+  const allCats = DB.cats.filter(c => c.show === true || c.show === 'yes');
+  const normalCats = allCats.filter(c => !c.is_department);
+  const departmentCats = allCats.filter(c => c.is_department);
+
+  // Render “All Categories” (existing grid)
+  const normalGrid = document.getElementById('homeCatGrid');
+  if (normalGrid) {
+    if (!normalCats.length) {
+      normalGrid.innerHTML = '<div style="padding:20px;">Koi category nahi.</div>';
+    } else {
+      normalGrid.innerHTML = normalCats.map(c => {
+        const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
+        const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
+        const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
+        const url = buildUrl('cat', { cat: c.id });
+        return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
+          <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
+          <div class="cat-arr">›</div>
+        </a>`;
+      }).join('');
+    }
   }
-  el.innerHTML = shown.map(c => {
-    const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
-    const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
-    const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
-    const url = buildUrl('cat', { cat: c.id });
-    return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
-      <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
-      <div class="cat-name">${c.name}</div>
-      <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
-      <div class="cat-arr">›</div>
-    </a>`;
-  }).join('');
-  document.getElementById('heroCatCount').textContent = shown.length;
+
+  // Render “All Departments” section
+  const deptGrid = document.getElementById('homeDeptGrid');
+  const deptSection = document.getElementById('homeDeptSec');
+  if (deptGrid && deptSection) {
+    if (!departmentCats.length) {
+      deptSection.style.display = 'none';
+    } else {
+      deptSection.style.display = 'block';
+      deptGrid.innerHTML = departmentCats.map(c => {
+        const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
+        const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
+        const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
+        const url = buildUrl('cat', { cat: c.id });
+        return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
+          <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
+          <div class="cat-arr">›</div>
+        </a>`;
+      }).join('');
+    }
+  }
+
+  document.getElementById('heroCatCount').textContent = allCats.length;
 }
 
 /* ====== Home MCQs ====== */
@@ -2576,7 +2624,7 @@ function refreshNavCats() {
   const blogBtn = document.getElementById('navBlog');
   if (!blogBtn) return;
 
-  const mainCats = DB.cats.filter(c => c.show === true || c.show === 'yes');
+  const mainCats = DB.cats.filter(c => (c.show === true || c.show === 'yes') && !c.is_department);
   for (const cat of mainCats) {
     const subCats = DB.subcats.filter(sub => sub.parent === cat.id);
     const container = document.createElement('div');
@@ -2657,7 +2705,7 @@ function refreshNavCats() {
 function refreshFooterCats() {
   const el = document.getElementById('footerCatLinks');
   if (!el) return;
-  const shown = DB.cats.filter(c => c.show === true || c.show === 'yes').slice(0, 8);
+  const shown = DB.cats.filter(c => (c.show === true || c.show === 'yes') && !c.is_department).slice(0, 8);
   el.innerHTML = shown.map(c => `
     <a href="${buildUrl('cat', { cat: c.id })}" 
        onclick="navigateTo('cat', { cat: '${c.id}' }); return false;">
@@ -3570,6 +3618,7 @@ function addCategory() {
   const nameEl = document.getElementById('newCatName');
   const colorEl = document.getElementById('newCatColor');
   const showEl = document.getElementById('newCatShow');
+  const isDepartment = document.getElementById('newCatDepartment')?.checked || false;
 
   const name = nameEl ? nameEl.value.trim() : '';
   const color = colorEl ? colorEl.value : '#e8f5ee';
@@ -3590,7 +3639,7 @@ function addCategory() {
   const autoIcons = ['📚','📖','🎯','💡','🏆','📋','🔍','✏️','📊','🌟','💼','🔬','🌍','💻','⚡','🎓','📜','🧪','🧬','🌏'];
   const icon = autoIcons[DB.cats.length % autoIcons.length];
 
-  const newCat = {id, name, icon, color, show, mcqs: 0};
+  const newCat = {id, name, icon, color, show, mcqs: 0, is_department: isDepartment};
   DB.cats.push(newCat);
 
   // ✅ Update EVERY part of the website immediately
@@ -3770,6 +3819,13 @@ function editCat(id, type) {
         <option value="yes" ${item.show?'selected':''}>✅ Yes — Homepage par show ho</option>
         <option value="no" ${!item.show?'selected':''}>🔒 No — Hidden raho</option>
       </select>`;
+    html += `<label style="${L}">Is Department?</label>
+      <div style="margin-bottom:12px;">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="ewCatDepartment" ${item.is_department ? 'checked' : ''}> 
+          <span style="font-size:13px;">Show in “All Departments” section on homepage</span>
+        </label>
+      </div>`;
   }
 
   document.getElementById('ewBody').innerHTML = html;
@@ -4721,6 +4777,8 @@ function saveEW() {
       item.icon = document.getElementById('ewCatIcon')?.value.trim() || item.icon;
       item.color = document.getElementById('ewCatColor')?.value || item.color;
       const showVal = document.getElementById('ewCatShow')?.value;
+      const isDepartment = document.getElementById('ewCatDepartment')?.checked || false;
+      item.is_department = isDepartment;
       item.show = (showVal === 'yes');
       renderHomeCats(); refreshNavCats(); refreshFooterCats();
     } else if (catType === 'sub') {

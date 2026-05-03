@@ -557,6 +557,9 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 .pg-btn.active { background:var(--em); border-color:var(--em); color:white; font-weight:800; }
 .pg-btn:disabled { opacity:.4; cursor:not-allowed; }
 
+/* Custom Classes */
+.text-decoration-none { text-decoration: none; }
+
 /* nav dropdown styles */
 .nav-item {
   position: relative;
@@ -687,12 +690,12 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 
 <!-- NAV -->
 <nav><div class="nav-inner" id="mainNav">
-  <button class="nav-btn active" id="navHome" onclick="go('home')">🏠 Home</button>
+  <a href="index.php" class="nav-btn active text-decoration-none" id="navHome">🏠 Home</a>
   <!-- JS will inject category buttons here with class dyn-nav -->
-  <button class="nav-btn" id="navBlog" onclick="go('blog')">✍️ Blog</button>
-  <button class="nav-btn" id="navInterview" onclick="go('interview')">💼 Interview</button>
-  <button class="nav-btn" id="navSaved" onclick="goSaved()">🔖 Saved</button>
-  <button class="nav-btn" id="navAsk" onclick="go('ask')">Ask Question</button>
+  <a class="nav-btn text-decoration-none" id="navBlog" href="index.php?page=blog">✍️ Blog</a>
+  <a class="nav-btn text-decoration-none" id="navInterview" href="index.php?page=interview">💼 Interview</a>
+  <a class="nav-btn text-decoration-none" id="navSaved" href="index.php?page=saved">🔖 Saved</a>
+  <a class="nav-btn text-decoration-none" id="navAsk" href="index.php?page=ask">Ask Question</a>
 </div></nav>
 
 <!-- ░░ HOME PAGE ░░ -->
@@ -1673,8 +1676,8 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
       </div>
       <p style="font-size:13px;color:#7aad94;line-height:1.7;">Pakistan's most comprehensive vokomoon platform. Trusted by 1.2M+ students nationwide for CSS, PPSC, FPSC, NTS exam preparation.</p>
     </div>
-    <div class="footer-col"><h5>Quick Links</h5><div id="footerCatLinks"><a onclick="go('home')">Home</a></div></div>
-    <div class="footer-col"><h5>Platform</h5><a onclick="go('blog')">Blog</a><a onclick="go('interview')">Interview Prep</a><a onclick="go('ask')">Ask Question</a><a onclick="go('admin')">Admin Panel</a></div>
+    <div class="footer-col"><h5>Quick Links</h5><div id="footerCatLinks"><a href="index.php">Home</a></div></div>
+    <div class="footer-col"><h5>Platform</h5><a href="index.php?page=blog">Blog</a><a href="index.php?page=interview">Interview Prep</a><a href="index.php?page=ask">Ask Question</a></div>
     <div class="footer-col"><h5>Contact</h5><a href="https://wa.me/923039181337" target="_blank">📱 +92 303 9181337</a><a href="#">About Us</a><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
   </div>
   <div class="footer-bot"><span>© 2026 Vokomoon.com — All rights reserved.</span><span>Made with ❤️ in Pakistan 🇵🇰</span></div>
@@ -1892,8 +1895,56 @@ async function init() {
   
   // Hide loading overlay
   if (overlay) overlay.style.display = 'none';
+
+  const { page, cat, sub, setNum, mcqId, postId, type, id } = getCurrentPageParams();
+  if (page !== 'home') {
+    navigateTo(page, { cat, sub, set: setNum, mcq: mcqId, post: postId, type, id });
+  } else {
+    go('home'); // ensures home page is active
+  }
 }
 window.addEventListener('DOMContentLoaded', init);
+// URL routing helpers (add at beginning of script)
+function getCurrentPageParams() {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get('page') || 'home';
+  const cat = params.get('cat');
+  const sub = params.get('sub');
+  const setNum = params.get('set');
+  const mcqId = params.get('mcq');
+  const postId = params.get('post');
+  const type = params.get('type');
+  const id = params.get('id');
+  return { page, cat, sub, setNum, mcqId, postId, type, id };
+}
+
+function buildUrl(page, extra = {}) {
+  if (page === 'home' && Object.keys(extra).length === 0) return 'index.php';
+  const params = new URLSearchParams();
+  if (page !== 'home') params.set('page', page);
+  for (let [k, v] of Object.entries(extra)) {
+    if (v !== undefined && v !== null && v !== '') params.set(k, v);
+  }
+  const qs = params.toString();
+  return qs ? 'index.php?' + qs : 'index.php';
+}
+
+// Enhanced navigation – updates URL and calls your existing go()
+function navigateTo(page, extra = {}) {
+  const newUrl = buildUrl(page, extra);
+  history.pushState({}, '', newUrl);
+  // Call your existing go() function – it already hides/shows pages and renders content
+  go(page);
+  // After go() finishes, manually load extra parameters if needed (e.g., open category page)
+  if (page === 'cat' && extra.cat) openCatPage(extra.cat);
+  else if (page === 'set' && extra.cat && extra.set) openSetPage(extra.cat, extra.sub || null, parseInt(extra.set));
+  else if (page === 'mcq' && extra.mcq) openMcqDetail(extra.mcq);
+  else if (page === 'blogpost' && extra.post) openBlogPost(extra.post);
+  else if (page === 'content' && extra.type && extra.id) openContent(extra.type, extra.id);
+  else if (page === 'blog') renderBlogPage();
+  else if (page === 'saved') renderSavedPage();
+  // ... add other dynamic pages as needed
+}
 
 /* ══════ NAVIGATION ══════ */
 function go(page) {
@@ -1956,10 +2007,13 @@ function openCatPage(catId) {
       return `<span style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--forest2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openSubSubCatPage('${catId}','${s.id}','${x.id}')">${x.name} (${xMcqs})</span>`;
     }).join('')}</div>` : '';
     return `<div>
-      <div class="subcat-row" onclick="openSetPage('${catId}','${s.id}',1)">
+    <a href="${buildUrl('set', { cat: catId, sub: s.id, set: 1 })}" class="subcat-row" style="display:flex; align-items:center;gap:10px;" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set:1}); return false;">
         <div class="subcat-l"><div class="subcat-dot"></div>${s.name}</div>
-        <div style="display:flex;align-items:center;gap:10px;"><span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span></div>
-      </div>${sscHtml}</div>`;
+        <div style="display:flex;align-items:center;gap:10px;">
+        <span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span>
+        </div>
+    </a>
+      ${sscHtml}</div>`;
   }).join('') :
   '<div style="padding:18px;text-align:center;color:var(--text3);">No sub-categories yet.</div>';
 
@@ -2363,42 +2417,37 @@ function mcqPrev() { if(curMcqIdx>0){curMcqIdx--;openMcqDetail(curMcqList[curMcq
 function renderHomeCats() {
   const el = document.getElementById('homeCatGrid');
   if (!el) return;
-  // Support both boolean true and string 'yes' for show
   const shown = DB.cats.filter(c => c.show === true || c.show === 'yes');
   if (!shown.length) {
-    el.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center;">Koi category nahi. Admin panel se add karein.</div>';
-    const hc = document.getElementById('heroCatCount');
-    if (hc) hc.textContent = '0';
+    el.innerHTML = '<div style="padding:20px;">Koi category nahi.</div>';
     return;
   }
   el.innerHTML = shown.map(c => {
-    const _subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
-    const _sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
-    const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || _subIds.includes(m.cat) || _sscIds.includes(m.cat)).length;
-    return `<div class="cat-card" onclick="openCatPage('${c.id}')">
+    const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
+    const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
+    const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
+    const url = buildUrl('cat', { cat: c.id });
+    return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
       <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
       <div class="cat-name">${c.name}</div>
       <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
       <div class="cat-arr">›</div>
-    </div>`;
+    </a>`;
   }).join('');
-  const hc = document.getElementById('heroCatCount');
-  if (hc) hc.textContent = shown.length;
+  document.getElementById('heroCatCount').textContent = shown.length;
 }
 
+/* ====== Home MCQs ====== */
 function renderHomeMcqs() {
   const el = document.getElementById('homeMcqList');
   if (!el) return;
-  // Latest first — sort by timestamp then id descending
-  const sorted = [...DB.mcqs].sort((a,b) => {
-    const ta = a.ts || a.id || 0; const tb = b.ts || b.id || 0;
-    return String(tb).localeCompare(String(ta));
-  });
-  const all = sorted.length ? [...sorted, ...DB.sampleMcqs].slice(0,6) : DB.sampleMcqs.slice(0,6);
-  if (!all.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);">No MCQs yet.</div>'; return; }
+  const sorted = [...DB.mcqs].sort((a,b) => (b.ts||b.id||0) - (a.ts||a.id||0));
+  const all = sorted.slice(0,6);
+  if (!all.length) { el.innerHTML = '<div>No MCQs yet.</div>'; return; }
   el.innerHTML = all.map((m,i) => {
     const cat = DB.cats.find(c => c.id === m.cat);
-    return `<div class="mcq-card" onclick="openMcqFromHome(${i})">
+    const url = buildUrl('mcq', { mcq: m.id });
+    return `<a href="${url}" class="mcq-card" style="display:flex; text-decoration:none;" onclick="navigateTo('mcq', {mcq:'${m.id}'}); return false;">
       <div class="mcq-num">#Q${i+1}</div>
       <div class="mcq-body">
         <div class="mcq-q">${m.q}</div>
@@ -2408,8 +2457,8 @@ function renderHomeMcqs() {
           <span class="mcq-views">👁 ${(m.views||0).toLocaleString()}</span>
         </div>
       </div>
-      ${saveBtnHtml('mcq',m.id,m.q,cat?.name||m.cat,"openMcqFromHome("+i+")")}
-    </div>`;
+      <div class="mcq-arr">›</div>
+    </a>`;
   }).join('');
 }
 
@@ -2490,45 +2539,50 @@ function openBlogPost(id) {
 function refreshNavCats() {
   const nav = document.getElementById('mainNav');
   if (!nav) return;
-  nav.querySelectorAll('.dyn-nav').forEach(el => el.remove());  // remove old dynamic items
+  nav.querySelectorAll('.dyn-nav').forEach(el => el.remove());
 
   const blogBtn = document.getElementById('navBlog');
   if (!blogBtn) return;
 
-  // Build tree of subcategories per main category
   const mainCats = DB.cats.filter(c => c.show === true || c.show === 'yes');
   for (const cat of mainCats) {
-    // Subcategories of this main category
     const subCats = DB.subcats.filter(sub => sub.parent === cat.id);
-    // Create container <div class="nav-item dyn-nav">
     const container = document.createElement('div');
     container.className = 'nav-item dyn-nav';
 
-    // Main button (same as before)
-    const mainBtn = document.createElement('button');
-    mainBtn.className = 'nav-btn';
-    mainBtn.textContent = cat.icon + ' ' + cat.name;
-    mainBtn.onclick = () => openCatPage(cat.id);
-    container.appendChild(mainBtn);
+    // ----- Main category link -----
+    const mainLink = document.createElement('a');
+    mainLink.className = 'nav-btn';
+    mainLink.textContent = cat.icon + ' ' + cat.name;
+    // Build real href
+    mainLink.href = buildUrl('cat', { cat: cat.id });
+    mainLink.classList.add('text-decoration-none');
+    mainLink.onclick = (e) => {
+      e.preventDefault();
+      navigateTo('cat', { cat: cat.id });
+      return false;
+    };
+    container.appendChild(mainLink);
 
     if (subCats.length) {
       const dropdownDiv = document.createElement('div');
       dropdownDiv.className = 'dropdown-content';
 
       for (const sub of subCats) {
-        // Check if this subcategory has sub-subcategories
         const subsubs = DB.subsubcats.filter(ssc => ssc.parent === sub.id);
         if (subsubs.length) {
-          // Nested dropdown (sub-dropdown)
+          // Subcategory with dropdown
           const subWrap = document.createElement('div');
           subWrap.className = 'sub-dropdown';
 
           const subLink = document.createElement('a');
-          subLink.className = 'dropdown-item';
+          subLink.className = 'dropdown-item text-decoration-none';
           subLink.textContent = sub.name;
+          subLink.href = buildUrl('set', { cat: cat.id, sub: sub.id, set: 1 });
           subLink.onclick = (e) => {
             e.preventDefault();
-            openSetPage(cat.id, sub.id, 1);
+            navigateTo('set', { cat: cat.id, sub: sub.id, set: 1 });
+            return false;
           };
           subWrap.appendChild(subLink);
 
@@ -2536,24 +2590,28 @@ function refreshNavCats() {
           subsubDiv.className = 'sub-dropdown-content';
           for (const ssc of subsubs) {
             const sscLink = document.createElement('a');
-            sscLink.className = 'dropdown-item';
+            sscLink.className = 'dropdown-item text-decoration-none';
             sscLink.textContent = ssc.name;
+            sscLink.href = buildUrl('set', { cat: cat.id, sub: ssc.id, set: 1 });
             sscLink.onclick = (e) => {
               e.preventDefault();
-              openSubSubCatPage(cat.id, sub.id, ssc.id);
+              navigateTo('set', { cat: cat.id, sub: ssc.id, set: 1 });
+              return false;
             };
             subsubDiv.appendChild(sscLink);
           }
           subWrap.appendChild(subsubDiv);
           dropdownDiv.appendChild(subWrap);
         } else {
-          // Simple subcategory link
+          // Simple subcategory
           const subLink = document.createElement('a');
-          subLink.className = 'dropdown-item';
+          subLink.className = 'dropdown-item text-decoration-none';
           subLink.textContent = sub.name;
+          subLink.href = buildUrl('set', { cat: cat.id, sub: sub.id, set: 1 });
           subLink.onclick = (e) => {
             e.preventDefault();
-            openSetPage(cat.id, sub.id, 1);
+            navigateTo('set', { cat: cat.id, sub: sub.id, set: 1 });
+            return false;
           };
           dropdownDiv.appendChild(subLink);
         }
@@ -2568,8 +2626,12 @@ function refreshFooterCats() {
   const el = document.getElementById('footerCatLinks');
   if (!el) return;
   const shown = DB.cats.filter(c => c.show === true || c.show === 'yes').slice(0, 8);
-  el.innerHTML = shown.map(c =>
-    `<a onclick="openCatPage('${c.id}')">${c.icon} ${c.name}</a>`).join('');
+  el.innerHTML = shown.map(c => `
+    <a href="${buildUrl('cat', { cat: c.id })}" 
+       onclick="navigateTo('cat', { cat: '${c.id}' }); return false;">
+      ${c.icon} ${c.name}
+    </a>
+  `).join('');
 }
 
 /* ══════ CATEGORY SELECTS ══════ */

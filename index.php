@@ -1925,6 +1925,16 @@ function buildUrl(page, extra = {}) {
   for (let [k, v] of Object.entries(extra)) {
     if (v !== undefined && v !== null && v !== '') params.set(k, v);
   }
+  if (page === 'mcq' && extra.mcq && !extra.slug) {
+    const mcq = DB.mcqs.find(m => m.id === extra.mcq);
+    if (mcq && mcq.q) {
+      const slug = mcq.q.toLowerCase()
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, '-')
+        .substring(0, 80);
+      if (slug) params.set('name', slug);
+    }
+  }
   const qs = params.toString();
   return qs ? 'index.php?' + qs : 'index.php';
 }
@@ -2007,13 +2017,13 @@ function openCatPage(catId) {
       return `<span style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--forest2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openSubSubCatPage('${catId}','${s.id}','${x.id}')">${x.name} (${xMcqs})</span>`;
     }).join('')}</div>` : '';
     return `<div>
-    <a href="${buildUrl('set', { cat: catId, sub: s.id, set: 1 })}" class="subcat-row" style="display:flex; align-items:center;gap:10px;" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set:1}); return false;">
+    <div class="subcat-row" style="display:flex; align-items:center;gap:10px;">
         <div class="subcat-l"><div class="subcat-dot"></div>${s.name}</div>
         <div style="display:flex;align-items:center;gap:10px;">
         <span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span>
         </div>
-    </a>
-      ${sscHtml}</div>`;
+    </div>
+      <a href="${buildUrl('set', { cat: catId, sub: s.id, set: 1 })}" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set:1}); return false;">${sscHtml}</a></div>`;
   }).join('') :
   '<div style="padding:18px;text-align:center;color:var(--text3);">No sub-categories yet.</div>';
 
@@ -2192,7 +2202,14 @@ function renderSetPage() {
       return `<div class="iq-card" id="iqCard_${m.id}">
         <div style="display:flex;align-items:flex-start;gap:0;margin-bottom:10px;">
           <span class="iq-num">${qNum}</span>
-          <div class="iq-q" style="margin-bottom:0;flex:1;">${m.q}</div>
+          <div class="iq-q" style="margin-bottom:0;flex:1;">
+            <a href="${buildUrl('mcq', { mcq: m.id })}" 
+              target="_blank" 
+              style="color:inherit; text-decoration:none;"
+              onclick="event.stopPropagation();">
+              ${m.q}
+            </a>
+          </div>
           ${saveBtnHtml('mcq',m.id,m.q,m.catName||m.cat,"openMcqDetail('"+m.id+"',0)")}
         </div>
         <div class="iq-body-row">
@@ -2447,7 +2464,7 @@ function renderHomeMcqs() {
   el.innerHTML = all.map((m,i) => {
     const cat = DB.cats.find(c => c.id === m.cat);
     const url = buildUrl('mcq', { mcq: m.id });
-    return `<a href="${url}" class="mcq-card" style="display:flex; text-decoration:none;" onclick="navigateTo('mcq', {mcq:'${m.id}'}); return false;">
+    return `<a href="${url}" class="mcq-card" style="display:flex; text-decoration:none;" onclick="navigateTo('mcq', {mcq:'${m.id}'}, {name: '${m.slug}'}); return false;">
       <div class="mcq-num">#Q${i+1}</div>
       <div class="mcq-body">
         <div class="mcq-q">${m.q}</div>
@@ -4187,7 +4204,7 @@ function liveSearch(q) {
   // Search MCQs
   DB.mcqs.filter(m => m.q.toLowerCase().includes(q)).slice(0,5).forEach(m => {
     const cat = DB.cats.find(c => c.id === m.cat);
-    results.push({ type:'mcq', icon:'❓', bg:'rgba(34,201,123,.1)', title: m.q.substring(0,70)+(m.q.length>70?'…':''), sub: (cat?.name||m.cat)+' · '+m.diff, action:`openMcqDetail('${m.id}',0)` });
+    results.push({ type:'mcq', icon:'❓', bg:'rgba(34,201,123,.1)', title: m.q.substring(0,70)+(m.q.length>70?'…':''), sub: (cat?.name||m.cat)+' · '+m.diff, action:`navigateTo('mcq', { mcq: '${m.id}' }); return false;` });
   });
   // Search categories
   DB.cats.filter(c => c.name.toLowerCase().includes(q)).slice(0,3).forEach(c => {

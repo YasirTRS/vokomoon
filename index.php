@@ -10,6 +10,9 @@
 <title>Vokomoon – Pakistan's #1 vokomoon Platform</title>
 <link rel="shortcut icon" href="Vokomoon.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
 :root{
   --forest:#0D3B2E;--forest2:#1A5C47;--em:#22C97B;--emlt:#4EDDA0;
@@ -1126,41 +1129,31 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="adm-pg-sub">Create multiple MCQs at once. All publish to website and homepage instantly.</div>
 
   <!-- PUBLISH TARGET SELECTOR -->
-  <div class="adm-form" style="margin-bottom:18px;background:rgba(34,201,123,.06);border:1.5px solid rgba(34,201,123,.25);">
-    <div style="font-size:13px;font-weight:800;color:var(--aa);margin-bottom:14px;display:flex;align-items:center;gap:8px;">📍 Publish Target — Sirf Ek Select Karein</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
-      <!-- Option 1: Main Category -->
-      <div id="ptBox1" class="pt-box pt-active" onclick="selectPT(1)" style="border:2px solid var(--aa);background:rgba(34,201,123,.12);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;">
-        <div style="font-size:13px;font-weight:800;color:var(--aa);margin-bottom:10px;">① Main Category</div>
-        <select class="adm-sel" id="pt1Cat" onclick="event.stopPropagation()">
-          <option value="">Select Main Category…</option>
-        </select>
-      </div>
-      <!-- Option 2: Sub Category -->
-      <div id="ptBox2" class="pt-box" onclick="selectPT(2)" style="border:2px solid var(--abr);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;opacity:.55;">
-        <div style="font-size:13px;font-weight:800;color:var(--at);margin-bottom:10px;">② Sub Category</div>
-        <select class="adm-sel" id="pt2Main" onclick="event.stopPropagation()" onchange="loadPT2Subs()" style="margin-bottom:8px;">
-          <option value="">Select Main Category…</option>
-        </select>
-        <select class="adm-sel" id="pt2Sub" onclick="event.stopPropagation()">
-          <option value="">— Pehle Main Select Karein —</option>
-        </select>
-      </div>
-      <!-- Option 3: Sub-Sub Category -->
-      <div id="ptBox3" class="pt-box" onclick="selectPT(3)" style="border:2px solid var(--abr);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;opacity:.55;">
-        <div style="font-size:13px;font-weight:800;color:var(--at);margin-bottom:10px;">③ Sub-Sub Category</div>
-        <select class="adm-sel" id="pt3Main" onclick="event.stopPropagation()" onchange="loadPT3Subs()" style="margin-bottom:8px;">
-          <option value="">Select Main Category…</option>
-        </select>
-        <select class="adm-sel" id="pt3Sub" onclick="event.stopPropagation()" onchange="loadPT3SSC()" style="margin-bottom:8px;">
-          <option value="">— Pehle Main Select Karein —</option>
-        </select>
-        <select class="adm-sel" id="pt3SSC" onclick="event.stopPropagation()">
-          <option value="">— Pehle Sub Select Karein —</option>
-        </select>
-      </div>
-    </div>
+  <div class="adm-form" style="margin-bottom:20px;">
+  <div class="adm-form-title">📌 MCQ Categories (Multi‑Select)</div>
+  <div class="adm-form-sub">Aapka MCQ in tamam categories mein dikhega</div>
+
+  <div class="adm-f">
+    <label>Main Categories *</label>
+    <select id="mainCatSelect" class="adm-sel" multiple="multiple" style="width:100%">
+      <?php // Populated by JS with DB.cats ?>
+    </select>
   </div>
+
+  <div class="adm-f">
+    <label>Sub‑Categories (optional)</label>
+    <select id="subCatSelect" class="adm-sel" multiple="multiple" style="width:100%" disabled>
+      <option>— Pehle Main Category select karein —</option>
+    </select>
+  </div>
+
+  <div class="adm-f">
+    <label>Sub‑Sub‑Categories (optional)</label>
+    <select id="subsubCatSelect" class="adm-sel" multiple="multiple" style="width:100%" disabled>
+      <option>— Pehle Sub‑Category select karein —</option>
+    </select>
+  </div>
+</div>
 
   <div id="mcqBlocks">
     <div class="mcq-blk" id="mcqBlk1">
@@ -2012,6 +2005,52 @@ function getPublishedMcqs(mcqs) {
   return mcqs.filter(isMcqPublished);
 }
 
+/* ══════ Start Helper Methods ══════ */
+function updateMcqCountsMulti(mainCats, subCats, subsubCats) {
+  // For each main category
+  mainCats.forEach(mainId => {
+    const mainCat = DB.cats.find(c => c.id === mainId);
+    if (mainCat) mainCat.mcqs = (mainCat.mcqs || 0) + 1;
+  });
+
+  // For each sub category
+  subCats.forEach(subId => {
+    const subCat = DB.subcats.find(s => s.id === subId);
+    if (subCat) subCat.mcqs = (subCat.mcqs || 0) + 1;
+    // Also increment parent main category count (optional)
+    const parentMain = DB.cats.find(c => c.id === subCat?.parent);
+    if (parentMain) parentMain.mcqs = (parentMain.mcqs || 0) + 1;
+  });
+
+  // For each sub-sub category
+  subsubCats.forEach(sscId => {
+    const ssc = DB.subsubcats.find(x => x.id === sscId);
+    if (ssc) ssc.mcqs = (ssc.mcqs || 0) + 1;
+    // Also increment parent sub and main counts
+    const parentSub = DB.subcats.find(s => s.id === ssc?.parent);
+    if (parentSub) parentSub.mcqs = (parentSub.mcqs || 0) + 1;
+    const parentMain = DB.cats.find(c => c.id === ssc?.mainParent);
+    if (parentMain) parentMain.mcqs = (parentMain.mcqs || 0) + 1;
+  });
+}
+
+function mcqBelongsToCategory(mcq, catId, type) {
+  // type: 'main', 'sub', 'subsub'
+  if (type === 'main') {
+    if (mcq.main_cats) return mcq.main_cats.includes(catId);
+    else return mcq.cat === catId;           // backward compatibility
+  }
+  if (type === 'sub') {
+    if (mcq.sub_cats) return mcq.sub_cats.includes(catId);
+    else return false;
+  }
+  if (type === 'subsub') {
+    if (mcq.subsub_cats) return mcq.subsub_cats.includes(catId);
+    else return false;
+  }
+  return false;
+}
+
 function togglePassword() {
   const input = document.getElementById("lockInp");
   
@@ -2022,6 +2061,9 @@ function togglePassword() {
   }
 }
 
+/* ══════ End Helper Methods ══════ */
+
+// Opens category page, counts MCQs (including sub-cats), and renders sub-categories and sets
 function openCatPage(catId) {
   const cat = DB.cats.find(c => c.id === catId);
   if (!cat) return;
@@ -2032,7 +2074,11 @@ function openCatPage(catId) {
   // Real MCQ count — include sub-cat and sub-sub-cat MCQs (fix: ander publish hon)
   const _subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
   const _sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-  const realMcqsAll = DB.mcqs.filter(m => m.cat === catId || _subIds.includes(m.cat) || _sscIds.includes(m.cat));
+  const realMcqsAll = DB.mcqs.filter(m => 
+    mcqBelongsToCategory(m, catId, 'main') ||
+    _subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+    _sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+  );
   const realMcqs = getPublishedMcqs(realMcqsAll);
   const realCount = realMcqs.length;
   document.getElementById('cpMcqCnt').textContent = '📦 ' + realCount.toLocaleString() + ' MCQs';
@@ -2042,22 +2088,25 @@ function openCatPage(catId) {
   subEl.innerHTML = subs.length ? subs.map(s => {
     // Count: sub-cat direct MCQs + all sub-sub-cat MCQs under it
     const _sscIdsUnderSub = DB.subsubcats.filter(x => x.parent === s.id).map(x => x.id);
-    const subAllMcqs = DB.mcqs.filter(m => m.cat === s.id || _sscIdsUnderSub.includes(m.cat));
+    const subAllMcqs = DB.mcqs.filter(m => 
+      mcqBelongsToCategory(m, s.id, 'sub')
+    );
     const subRealMcqs = getPublishedMcqs(subAllMcqs).length;
     // Get sub-sub-cats under this sub
     const sscs = DB.subsubcats.filter(x => x.parent === s.id);
     const sscHtml = sscs.length ? `<div style="padding:0 18px 10px;display:flex;flex-wrap:wrap;gap:6px;">${sscs.map(x=>{
-      const xMcqs = getPublishedMcqs(DB.mcqs.filter(m => m.cat === x.id)).length;
+      const xMcqs = getPublishedMcqs(DB.mcqs.filter(m => mcqBelongsToCategory(m, x.id, 'subsub'))).length;
       return `<span style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--forest2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openSubSubCatPage('${catId}','${s.id}','${x.id}')">${x.name} (${xMcqs})</span>`;
     }).join('')}</div>` : '';
+    const sscId = sscs.length ? sscs[0].id : null; // for navigation if clicked on sub-cat without sub-sub-cats
     return `<div>
     <div class="subcat-row" style="display:flex; align-items:center;gap:10px;">
-        <div class="subcat-l"><div class="subcat-dot"></div>${s.name}</div>
+        <div class="subcat-l" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set: 1}); return false;"><div class="subcat-dot"></div>${s.name}</div>
         <div style="display:flex;align-items:center;gap:10px;">
         <span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span>
         </div>
     </div>
-      <a href="${buildUrl('set', { cat: catId, sub: s.id, set: 1 })}" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set:1}); return false;">${sscHtml}</a></div>`;
+      <a href="${buildUrl('set', { cat: catId, sub: sscId, set: 1 })}" onclick="navigateTo('set', {cat:'${catId}', sub:'${sscId}', set:1}); return false;">${sscHtml}</a></div>`;
   }).join('') :
   '<div style="padding:18px;text-align:center;color:var(--text3);">No sub-categories yet.</div>';
 
@@ -2159,19 +2208,36 @@ function renderSetPage() {
   document.getElementById('setSeoUrl').textContent = `Vokomoon.com/${catId}/${subcatId||'set'}/set-${setNum}`;
 
   // Get ALL MCQs for this category/subcat (including sub-sub categories)
-  let allMcqsRaw;
-  if (subcatId) {
-    if (ssc) {
-      allMcqsRaw = DB.mcqs.filter(m => m.cat === subcatId);
-    } else {
-      const sscIds = DB.subsubcats.filter(x => x.parent === subcatId).map(x => x.id);
-      allMcqsRaw = DB.mcqs.filter(m => m.cat === subcatId || sscIds.includes(m.cat));
-    }
+ let allMcqsRaw;
+if (subcatId) {
+  // Check if subcatId is a sub-category or sub-sub-category
+  const isSub = DB.subcats.some(s => s.id === subcatId);
+  const isSubSub = DB.subsubcats.some(x => x.id === subcatId);
+  
+  if (isSubSub) {
+    // sub-sub category: MCQs where subsub_cats includes this id
+    allMcqsRaw = DB.mcqs.filter(m => mcqBelongsToCategory(m, subcatId, 'subsub'));
+  } else if (isSub) {
+    // sub category: MCQs where sub_cats includes this id OR any sub-sub under it
+    const sscIds = DB.subsubcats.filter(x => x.parent === subcatId).map(x => x.id);
+    allMcqsRaw = DB.mcqs.filter(m => 
+      mcqBelongsToCategory(m, subcatId, 'sub') ||
+      sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+    );
   } else {
-    const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
-    const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-    allMcqsRaw = DB.mcqs.filter(m => m.cat === catId || subIds.includes(m.cat) || sscIds.includes(m.cat));
+    // fallback: treat as main or nothing
+    allMcqsRaw = [];
   }
+} else {
+  // Main category: all MCQs belonging to this main cat (including its sub & sub-sub)
+  const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
+  const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
+  allMcqsRaw = DB.mcqs.filter(m => 
+    mcqBelongsToCategory(m, catId, 'main') ||
+    subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+    sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+  );
+}
   const allMcqs = getPublishedMcqs(allMcqsRaw);
   // 1 Set = 100 MCQs (10 sections x 10 MCQs)
   const mcqsPerSet2 = 100;
@@ -2477,7 +2543,11 @@ function renderHomeCats() {
       normalGrid.innerHTML = normalCats.map(c => {
         const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
         const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
-        const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
+        const realMcqCnt = DB.mcqs.filter(m => 
+          mcqBelongsToCategory(m, c.id, 'main') ||
+          subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+          sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+        ).length;
         const url = buildUrl('cat', { cat: c.id });
         return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
           <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
@@ -2747,6 +2817,63 @@ function refreshAllCatSelects() {
 
 /* ══════ ADMIN LOGIN ══════ */
 let admLoggedIn = false;
+let mainSelect, subSelect, subsubSelect;
+
+function initMultiCatSelectors() {
+  mainSelect = $('#mainCatSelect').select2({
+    placeholder: "Select one or more main categories",
+    allowClear: true
+  });
+  subSelect = $('#subCatSelect').select2({
+    placeholder: "Select sub‑categories (optional)",
+    allowClear: true
+  });
+  subsubSelect = $('#subsubCatSelect').select2({
+    placeholder: "Select sub‑sub‑categories (optional)",
+    allowClear: true
+  });
+
+  // Populate main categories
+  mainSelect.empty();
+  DB.cats.filter(c => !c.is_department && (c.show===true||c.show==='yes')).forEach(c => {
+    mainSelect.append(new Option(c.icon+' '+c.name, c.id, false, false));
+  });
+  mainSelect.trigger('change');
+
+  // When main categories change → load matching subcategories
+  mainSelect.on('change', function() {
+    const selectedMainIds = $(this).val() || [];
+    subSelect.prop('disabled', selectedMainIds.length === 0);
+    if (selectedMainIds.length === 0) {
+      subSelect.empty().append(new Option('— Pehle Main Category select karein —', ''));
+      subSelect.trigger('change');
+      return;
+    }
+
+    const subs = DB.subcats.filter(s => selectedMainIds.includes(s.parent));
+    subSelect.empty();
+    subs.forEach(s => {
+      subSelect.append(new Option(s.name, s.id, false, false));
+    });
+    subSelect.trigger('change');
+  });
+
+  // When subcategories change → load matching sub‑subcategories
+  subSelect.on('change', function() {
+    const selectedSubIds = $(this).val() || [];
+    subsubSelect.prop('disabled', selectedSubIds.length === 0);
+    if (selectedSubIds.length === 0) {
+      subsubSelect.empty().append(new Option('— Pehle Sub‑Category select karein —', ''));
+      return;
+    }
+
+    const subsubs = DB.subsubcats.filter(x => selectedSubIds.includes(x.parent));
+    subsubSelect.empty();
+    subsubs.forEach(ss => {
+      subsubSelect.append(new Option(ss.name, ss.id, false, false));
+    });
+  });
+}
 
 async function doAdmLogin() {
   const p = document.getElementById('lockInp').value;
@@ -2807,6 +2934,7 @@ function doAdmLogout() {
 }
 
 function admTab(t, el) {
+  initMultiCatSelectors()
   document.querySelectorAll('.adm-tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('active'));
   const pg = document.getElementById('admt-' + t);
@@ -3076,34 +3204,90 @@ function publishSingleMcq(n) {
 
 // Publish Question #1 individually (uses shared PT selectors)
 function publishSingleMcqFirst() {
-  const pt = getPublishTarget('pt');
-  if (!pt) { toast('⚠️ Publish target select karein!','e'); return; }
+  // 1. Get selected categories from multi‑selects
+  const mainCats = mainSelect ? mainSelect.val() : [];
+  const subCats = subSelect ? subSelect.val() : [];
+  const subsubCats = subsubSelect ? subsubSelect.val() : [];
+
+  if (!mainCats || mainCats.length === 0) {
+    toast('⚠️ Kam se kam ek Main Category select karein!', 'e');
+    return;
+  }
+
+  // 2. Get question block elements
   const blk = document.getElementById('mcqBlk1');
   if (!blk) return;
+
   const qEl = document.getElementById('mcqQ1');
-  const q = qEl ? (qEl.innerText||'').trim() : '';
+  const q = qEl ? (qEl.innerText || '').trim() : '';
   const qHtml = qEl ? qEl.innerHTML.trim() : '';
-  if (!q) { toast('⚠️ Question likhein!','e'); qEl?.focus(); return; }
+  if (!q) {
+    toast('⚠️ Question likhein!', 'e');
+    qEl?.focus();
+    return;
+  }
+
+  // 3. Collect options and correct answer
   const optInputs = Array.from(blk.querySelectorAll('.opt-row input[type="text"]'));
   const opts = optInputs.map(inp => inp.value.trim() || 'Option');
   const radios = Array.from(blk.querySelectorAll('.opt-radio'));
   const correct = radios.findIndex(r => r.checked);
+  if (correct === -1) {
+    toast('⚠️ Correct option select karein!', 'e');
+    return;
+  }
+
+  // 4. Other MCQ fields
   const diff = document.getElementById('mcqDiff1')?.value || 'Easy';
   const expEl = document.getElementById('mcqExp1');
   const exp = expEl ? (expEl.innerHTML || '') : '';
-  const set = parseInt(document.getElementById('mcqSet1')?.value)||1;
+  const set = parseInt(document.getElementById('mcqSet1')?.value) || 1;
   const scheduledAt = document.getElementById('mcqSched1')?.value || null;
-  const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
-  updateMcqCounts(pt);
-  renderHomeMcqs(); renderHomeCats(); renderMcqTable(); updateDashStats();
-  addToAllContent('mcq','❓','1 MCQ — '+pt.catName);
-  logAct('✏️','Question #1 published — '+pt.catName,'st-pub','Published');
-  if(qEl) qEl.innerHTML='';
-  if(expEl) expEl.innerHTML='';
-  optInputs.forEach(inp => inp.value='');
-  toast('✅ Question #1 "'+pt.catName+'" mein live ho gaya!','s');
-  saveDB(); renderAllContent();
+
+  // 5. Create unique ID and store MCQ
+  const id = 'm' + Date.now() + Math.random().toString(36).substr(2, 8);
+  DB.mcqs.push({
+    id,
+    main_cats: mainCats,
+    sub_cats: subCats,
+    subsub_cats: subsubCats,
+    q: qHtml || q,
+    opts,
+    correct,
+    diff,
+    exp,
+    set,
+    scheduled_at: scheduledAt,
+    date: new Date().toLocaleDateString(),
+    views: 0
+  });
+
+  // 6. Update counts for all selected categories
+  updateMcqCountsMulti(mainCats, subCats, subsubCats);
+
+  // 7. Refresh UI everywhere
+  renderHomeMcqs();
+  renderHomeCats();
+  renderMcqTable();
+  updateDashStats();
+  addToAllContent('mcq', '❓', '1 MCQ — ' + mainCats.map(cid => {
+    const cat = DB.cats.find(c => c.id === cid);
+    return cat ? cat.name : cid;
+  }).join(', '));
+  logAct('✏️', 'Question #1 published in ' + mainCats.length + ' main category(s)', 'st-pub', 'Published');
+
+  // 8. Clear form fields
+  if (qEl) qEl.innerHTML = '';
+  if (expEl) expEl.innerHTML = '';
+  optInputs.forEach(inp => inp.value = '');
+  // Reset multi‑selects (optional)
+  if (mainSelect) mainSelect.val(null).trigger('change');
+  if (subSelect) subSelect.val(null).trigger('change');
+  if (subsubSelect) subsubSelect.val(null).trigger('change');
+
+  toast('✅ MCQ successfully published in ' + mainCats.length + ' category(s)!', 's');
+  saveDB();
+  renderAllContent();
 }
 
 function addOpt(n) {
@@ -3411,7 +3595,9 @@ function renderMcqTable() {
     return `<tr>
       <td style="color:var(--ad);">${String(i+1).padStart(3,'0')}</td>
       <td class="td-main" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.q.substring(0,55)}…</td>
-      <td><span class="chip-a">${catName}</span></td>
+      <td><span class="chip-a">
+        ${m.main_cats ? m.main_cats.map(cid => DB.cats.find(c=>c.id===cid)?.name).join(', ') : (DB.cats.find(c=>c.id===m.cat)?.name || m.cat)}
+      </span></td>
       <td><span class="diff-${m.diff==='Hard'?'h':m.diff==='Medium'?'m':'e'}">${m.diff}</span></td>
       <td>
         ${!m.scheduled_at || new Date(m.scheduled_at) <= new Date() 

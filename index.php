@@ -8,7 +8,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Vokomoon – Pakistan's #1 vokomoon Platform</title>
+<link rel="shortcut icon" href="Vokomoon.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
 :root{
   --forest:#0D3B2E;--forest2:#1A5C47;--em:#22C97B;--emlt:#4EDDA0;
@@ -59,7 +63,7 @@ header{background:var(--white);box-shadow:var(--sh);position:sticky;top:0;z-inde
 
 /* NAV */
 nav{background:var(--forest);border-bottom:3px solid var(--em)}
-.nav-inner{max-width:100%;padding:0 24px;display:flex;align-items:center;flex-wrap:nowrap;gap:0;overflow-x:auto;}
+.nav-inner{max-width:100%;padding:0 24px;display:flex;align-items:center;flex-wrap:nowrap;gap:0;}
 .nav-btn{color:#c8e8d8;font-size:13px;font-weight:500;padding:12px 14px;display:flex;align-items:center;gap:5px;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;cursor:pointer;transition:.2s;background:none;border-left:none;border-right:none;border-top:none;font-family:"DM Sans",sans-serif}
 .nav-btn:hover{color:var(--emlt);border-bottom-color:var(--gold)}
 .nav-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
@@ -541,6 +545,7 @@ textarea.adm-inp{resize:vertical;min-height:80px}
 nav::-webkit-scrollbar{display:none}
 nav{-ms-overflow-style:none;scrollbar-width:none;}
 #sectionTabs::-webkit-scrollbar{display:none;}
+#sectionTabs2::-webkit-scrollbar{display:none;}
 
 /* PUBLISH TARGET BOXES */
 .pt-box { transition:.2s; }
@@ -554,6 +559,89 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 .pg-btn:hover { border-color:var(--em); color:var(--em); }
 .pg-btn.active { background:var(--em); border-color:var(--em); color:white; font-weight:800; }
 .pg-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Custom Classes */
+.text-decoration-none { text-decoration: none; }
+
+/* nav dropdown styles */
+.nav-item {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--forest);
+  min-width: 200px;
+  border-radius: 12px;
+  box-shadow: var(--sh2);
+  z-index: 1050;
+  display: none;
+  padding: 8px 0;
+}
+.nav-item:hover .dropdown-content {
+  display: block;
+}
+.dropdown-item {
+  display: block;
+  padding: 8px 18px;
+  color: #c8e8d8;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dropdown-item:hover {
+  background: rgba(34, 201, 123, 0.15);
+  color: var(--emlt);
+}
+.sub-dropdown {
+  position: relative;
+}
+.sub-dropdown-content {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: var(--forest2);
+  min-width: 200px;
+  border-radius: 12px;
+  box-shadow: var(--sh2);
+  display: none;
+  padding: 6px 0;
+}
+.sub-dropdown:hover .sub-dropdown-content {
+  display: block;
+}
+/* adjust for RTL or left-edge issues */
+.sub-dropdown-content .dropdown-item {
+  color: #e0f0e8;
+}
+.sub-dropdown-content .dropdown-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+@media(max-width:900px){
+  .set-page-grid { grid-template-columns: 1fr !important; }
+}
+
+.category-tree {
+  font-size: 14px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 6px 12px 12px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.cat-name-link {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text2);
+  transition: 0.1s;
+}
 </style>
 </head>
 <body>
@@ -587,7 +675,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="header-inner">
     <div class="logo" onclick="go('home')">
       <div class="logo-icon"><svg viewBox="0 0 24 24" stroke="white" stroke-width="2.2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-      <div><div class="logo-name">Voko<span>moon</span></div><div class="logo-sub">Smart Learning Hub</div></div>
+      <div><div class="logo-name">VoKo<span>Moon</span></div><div class="logo-sub">Smart Learning Hub</div></div>
     </div>
     <div class="h-search">
       <svg width="15" height="15" viewBox="0 0 24 24" stroke="#6B9B82" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -596,7 +684,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     <!-- Search Results Dropdown -->
     <div id="searchDrop" style="display:none;position:absolute;top:68px;left:50%;transform:translateX(-50%);width:480px;max-width:90vw;background:white;border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--sh3);z-index:9999;max-height:400px;overflow-y:auto;"></div>
     <div class="h-actions" id="hActions">
-      <button class="btn-admin" onclick="go('admin')"><div class="dot"></div>🛡️ <span class="btn-lbl">Admin Panel</span></button>
+      <!-- <button class="btn-admin" onclick="go('admin')"><div class="dot"></div>🛡️ <span class="btn-lbl">Admin Panel</span></button> -->
       <button class="btn-login" onclick="openAuth('login')">Login</button>
       <button class="btn-reg" onclick="openAuth('register')">Register Free</button>
     </div>
@@ -604,13 +692,13 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 </header>
 
 <!-- NAV -->
-<nav style="overflow-x:auto;"><div class="nav-inner" id="mainNav">
-  <button class="nav-btn active" id="navHome" onclick="go('home')">🏠 Home</button>
+<nav><div class="nav-inner" id="mainNav">
+  <a href="index.php" class="nav-btn active text-decoration-none" id="navHome">🏠 Home</a>
   <!-- JS will inject category buttons here with class dyn-nav -->
-  <button class="nav-btn" id="navBlog" onclick="go('blog')">✍️ Blog</button>
-  <button class="nav-btn" id="navInterview" onclick="go('interview')">💼 Interview</button>
-  <button class="nav-btn" id="navSaved" onclick="goSaved()">🔖 Saved</button>
-  <button class="nav-btn" id="navAsk" onclick="go('ask')">Ask Question</button>
+  <a class="nav-btn text-decoration-none" id="navBlog" href="index.php?page=blog">✍️ Blog</a>
+  <a class="nav-btn text-decoration-none" id="navInterview" href="index.php?page=interview">💼 Interview</a>
+  <a class="nav-btn text-decoration-none" id="navSaved" href="index.php?page=saved">🔖 Saved</a>
+  <a class="nav-btn text-decoration-none" id="navAsk" href="index.php?page=ask">Ask Question</a>
 </div></nav>
 
 <!-- ░░ HOME PAGE ░░ -->
@@ -637,6 +725,16 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
         <div><div class="sec-title">All Categories</div><div style="font-size:13px;color:var(--text3);margin-top:3px;">Click any category to explore MCQ sets</div></div>
       </div>
       <div class="cat-grid" id="homeCatGrid"><!-- JS --></div>
+    </div>
+  </div>
+
+  <!-- Departments Section -->
+  <div id="homeDeptSec" style="display:none; background:var(--white); border-bottom:1.5px solid var(--border); padding:28px 0;">
+    <div class="container">
+      <div class="sec-row">
+        <div><div class="sec-title">All Departments</div><div style="font-size:13px;color:var(--text3);margin-top:3px;">Specialized subject departments</div></div>
+      </div>
+      <div class="cat-grid" id="homeDeptGrid"><!-- JS will populate --></div>
     </div>
   </div>
 
@@ -740,7 +838,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
 
 <!-- ░░ SET PAGE ░░ -->
 <div class="page" id="page-setpage">
-  <div class="seo-bar"><div class="container"><code id="setSeoUrl">Vokomoon.pk/…</code> <span style="color:var(--em);font-weight:600;margin-left:8px;">✓ SEO URL</span></div></div>
+  <div class="seo-bar"><div class="container"><code id="setSeoUrl">Vokomoon.com/…</code> <span style="color:var(--em);font-weight:600;margin-left:8px;">✓ SEO URL</span></div></div>
   <div class="cat-header" style="padding:24px;"><div class="container">
     <div id="setBread" style="font-size:13px;color:#a8d4bc;margin-bottom:6px;"></div>
     <h2 style="font-size:24px;" id="setTitle">Set 1</h2>
@@ -753,19 +851,28 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     </div>
   </div>
   <div class="container" style="padding-top:22px;padding-bottom:40px;">
-    <div id="setMcqList"></div>
-    <!-- Submit Button -->
-    <div id="setSubmitWrap" style="display:none;margin-top:20px;text-align:center;">
-      
-      <button class="btn btn-o" onclick="resetSetAnswers()" id="setResetBtn" style="padding:12px 24px;font-size:15px;display:none;margin-left:10px;">🔄 Try Again</button>
+    <div class="set-page-grid" style="display:grid;grid-template-columns:1fr 280px;gap:28px;">
+      <!-- left side: MCQs, buttons, pagination -->
+      <div class="set-left">
+        <div id="setMcqList"></div>
+        <div id="setSubmitWrap" style="display:none;margin-top:20px;text-align:center;">
+          <button class="btn btn-o" onclick="resetSetAnswers()" id="setResetBtn" style="padding:12px 24px;font-size:15px;display:none;margin-left:10px;">🔄 Try Again</button>
+        </div>
+        <div id="sectionTabs2" style="display:flex;gap:4px;padding:10px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;"></div>
+        <div class="pagination" id="setPag"></div>
+      </div>
+      <!-- right side: category browser -->
+      <div class="set-right">
+        <div class="set-categories-header" style="font-weight:800;font-size:16px;margin-bottom:12px;">📚 Categories</div>
+        <div id="setCategoriesSidebar"></div>
+      </div>
     </div>
-    <div class="pagination" id="setPag"></div>
   </div>
 </div>
 
 <!-- ░░ MCQ DETAIL ░░ -->
 <div class="page" id="page-mcqdetail">
-  <div class="seo-bar"><div class="container"><code id="mcqSeoUrl">Vokomoon.pk/q/…</code></div></div>
+  <div class="seo-bar"><div class="container"><code id="mcqSeoUrl">Vokomoon.com/q/…</code></div></div>
   <div class="detail-wrap">
     <div id="mcqBread" style="font-size:12.5px;color:var(--text3);margin-bottom:10px;"></div>
     <div class="detail-card">
@@ -910,7 +1017,23 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="lock-title">Admin Panel</div>
   <div class="lock-sub">Enter password to access Vokomoon Admin</div>
   <div class="lock-err" id="lockErr">❌ Wrong password. Try again.</div>
-  <input type="password" class="lock-inp" id="lockInp" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doAdmLogin()">
+  <div style="position: relative;">
+        <input 
+          type="password" 
+          class="lock-inp" 
+          id="lockInp" 
+          placeholder="Enter password…" 
+          onkeydown="if(event.key==='Enter')doAdmLogin()"
+        >
+        
+        <!-- Toggle button -->
+        <span 
+          onclick="togglePassword()" 
+          style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;"
+        >
+          👁️
+        </span>
+      </div>
   <button class="lock-btn" onclick="doAdmLogin()">🔓 Access Admin Panel</button>
 </div>
 </div>
@@ -1006,49 +1129,35 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
   <div class="adm-pg-sub">Create multiple MCQs at once. All publish to website and homepage instantly.</div>
 
   <!-- PUBLISH TARGET SELECTOR -->
-  <div class="adm-form" style="margin-bottom:18px;background:rgba(34,201,123,.06);border:1.5px solid rgba(34,201,123,.25);">
-    <div style="font-size:13px;font-weight:800;color:var(--aa);margin-bottom:14px;display:flex;align-items:center;gap:8px;">📍 Publish Target — Sirf Ek Select Karein</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
-      <!-- Option 1: Main Category -->
-      <div id="ptBox1" class="pt-box pt-active" onclick="selectPT(1)" style="border:2px solid var(--aa);background:rgba(34,201,123,.12);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;">
-        <div style="font-size:13px;font-weight:800;color:var(--aa);margin-bottom:10px;">① Main Category</div>
-        <select class="adm-sel" id="pt1Cat" onclick="event.stopPropagation()">
-          <option value="">Select Main Category…</option>
-        </select>
-      </div>
-      <!-- Option 2: Sub Category -->
-      <div id="ptBox2" class="pt-box" onclick="selectPT(2)" style="border:2px solid var(--abr);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;opacity:.55;">
-        <div style="font-size:13px;font-weight:800;color:var(--at);margin-bottom:10px;">② Sub Category</div>
-        <select class="adm-sel" id="pt2Main" onclick="event.stopPropagation()" onchange="loadPT2Subs()" style="margin-bottom:8px;">
-          <option value="">Select Main Category…</option>
-        </select>
-        <select class="adm-sel" id="pt2Sub" onclick="event.stopPropagation()">
-          <option value="">— Pehle Main Select Karein —</option>
-        </select>
-      </div>
-      <!-- Option 3: Sub-Sub Category -->
-      <div id="ptBox3" class="pt-box" onclick="selectPT(3)" style="border:2px solid var(--abr);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;opacity:.55;">
-        <div style="font-size:13px;font-weight:800;color:var(--at);margin-bottom:10px;">③ Sub-Sub Category</div>
-        <select class="adm-sel" id="pt3Main" onclick="event.stopPropagation()" onchange="loadPT3Subs()" style="margin-bottom:8px;">
-          <option value="">Select Main Category…</option>
-        </select>
-        <select class="adm-sel" id="pt3Sub" onclick="event.stopPropagation()" onchange="loadPT3SSC()" style="margin-bottom:8px;">
-          <option value="">— Pehle Main Select Karein —</option>
-        </select>
-        <select class="adm-sel" id="pt3SSC" onclick="event.stopPropagation()">
-          <option value="">— Pehle Sub Select Karein —</option>
-        </select>
-      </div>
-    </div>
+  <div class="adm-form" style="margin-bottom:20px;">
+  <div class="adm-form-title">📌 MCQ Categories (Multi‑Select)</div>
+  <div class="adm-form-sub">Aapka MCQ in tamam categories mein dikhega</div>
+
+  <div class="adm-f">
+    <label>Main Categories *</label>
+    <select id="mainCatSelect" class="adm-sel" multiple="multiple" style="width:100%">
+      <?php // Populated by JS with DB.cats ?>
+    </select>
   </div>
+
+  <div class="adm-f">
+    <label>Sub‑Categories (optional)</label>
+    <select id="subCatSelect" class="adm-sel" multiple="multiple" style="width:100%" disabled>
+      <option>— Pehle Main Category select karein —</option>
+    </select>
+  </div>
+
+  <div class="adm-f">
+    <label>Sub‑Sub‑Categories (optional)</label>
+    <select id="subsubCatSelect" class="adm-sel" multiple="multiple" style="width:100%" disabled>
+      <option>— Pehle Sub‑Category select karein —</option>
+    </select>
+  </div>
+</div>
 
   <div id="mcqBlocks">
     <div class="mcq-blk" id="mcqBlk1">
       <div class="mcq-blk-head"><div class="mcq-blk-num">Question #1</div><button class="ab ab-d" id="mcqRem1" style="display:none;" onclick="remMcqBlk(1)">✕ Remove</button></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="adm-f" style="margin-bottom:0;"><label>Difficulty</label><select class="adm-sel" id="mcqDiff1"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
-        <div class="adm-f" style="margin-bottom:0;"><label>Set #</label><input type="number" class="adm-inp" id="mcqSet1" placeholder="e.g. 1" min="1" value="1"></div>
-      </div>
       <div class="adm-f"><label>Question Text *</label>
         <div class="ed-toolbar" style="margin-bottom:0;border-radius:8px 8px 0 0;">
           <button class="ed-btn" onclick="expCmd('q1','bold')"><b>B</b></button>
@@ -1087,6 +1196,8 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
           <button class="ed-btn" onclick="expCmd(1,'insertUnorderedList')">• List</button>
           <button class="ed-btn" onclick="expCmd(1,'insertOrderedList')">1. List</button>
           <div class="ed-sep"></div>
+          <button class="ed-btn" onclick="insertTableInExp(1)">📊 Table</button>
+          <button class="ed-btn" onclick="applyTextColorToExp(1)">🎨 Color</button>
           <button class="ed-btn" onclick="expCmd(1,'undo')">↩</button>
           <button class="ed-btn" onclick="expCmd(1,'redo')">↪</button>
         </div>
@@ -1102,10 +1213,8 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:14px;">
-    <button class="ab" style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--aa);" onclick="addMcqBlk()">＋ Add Another Question</button>
     <div style="display:flex;gap:9px;">
       <button class="ab ab-o" onclick="toast('💾 Saved as Draft!','i')">💾 Save Draft</button>
-      <button class="ab ab-p" onclick="publishMcqs()">🚀 Publish All MCQs to Website</button>
     </div>
   </div>
 </div>
@@ -1205,7 +1314,7 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
         <div class="adm-f"><label>Featured Emoji / Color</label><input type="text" class="adm-inp" id="artEmoji" placeholder="e.g. 📝 or leave blank"></div>
         <div class="adm-f"><label>⏰ Schedule (blank = now)</label><input type="datetime-local" class="adm-inp" id="artSched"></div>
         <div class="adm-f"><label>URL Slug</label><input type="text" class="adm-inp" id="artSlug" placeholder="my-article-url"></div>
-        <div class="slug-preview">Vokomoon.pk/blog/<span id="slugPrev">my-article-url</span></div>
+        <div class="slug-preview">Vokomoon.com/blog/<span id="slugPrev">my-article-url</span></div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
           <button class="ab ab-o" style="width:100%;justify-content:center;" onclick="saveArtDraft()">💾 Save Draft</button>
           <button class="ab ab-p" style="width:100%;justify-content:center;padding:11px;" onclick="publishArt()">🚀 Publish Now</button>
@@ -1384,6 +1493,12 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
       <div class="adm-form-title">➕ Add Main Category</div>
       <div class="adm-form-sub">Shows on homepage + nav bar</div>
       <div class="adm-f"><label>Category Name *</label><input type="text" class="adm-inp" id="newCatName" placeholder="e.g. Economics, Urdu, Islamiat…"></div>
+      <div class="adm-f">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="newCatDepartment" value="yes"> 
+          <span>📁 Is Department? (Show in “All Departments” section on homepage)</span>
+        </label>
+      </div>
       <div class="adm-f"><label>Background Color</label><input type="color" class="adm-inp" id="newCatColor" value="#e8f5ee" style="height:42px;cursor:pointer;"></div>
       <div class="adm-f"><label>Show on Homepage?</label><select class="adm-sel" id="newCatShow"><option value="yes">✅ Yes — Show on homepage</option><option value="no">🔒 No — Hidden from homepage</option></select></div>
       <button class="ab ab-p" style="width:100%;padding:13px;font-size:15px;font-weight:800;justify-content:center;margin-top:6px;" onclick="addCategory()">✅ Add Category</button>
@@ -1570,11 +1685,11 @@ nav{-ms-overflow-style:none;scrollbar-width:none;}
       </div>
       <p style="font-size:13px;color:#7aad94;line-height:1.7;">Pakistan's most comprehensive vokomoon platform. Trusted by 1.2M+ students nationwide for CSS, PPSC, FPSC, NTS exam preparation.</p>
     </div>
-    <div class="footer-col"><h5>Quick Links</h5><div id="footerCatLinks"><a onclick="go('home')">Home</a></div></div>
-    <div class="footer-col"><h5>Platform</h5><a onclick="go('blog')">Blog</a><a onclick="go('interview')">Interview Prep</a><a onclick="go('ask')">Ask Question</a><a onclick="go('admin')">Admin Panel</a></div>
+    <div class="footer-col"><h5>Quick Links</h5><div id="footerCatLinks"><a href="index.php">Home</a></div></div>
+    <div class="footer-col"><h5>Platform</h5><a href="index.php?page=blog">Blog</a><a href="index.php?page=interview">Interview Prep</a><a href="index.php?page=ask">Ask Question</a></div>
     <div class="footer-col"><h5>Contact</h5><a href="https://wa.me/923039181337" target="_blank">📱 +92 303 9181337</a><a href="#">About Us</a><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
   </div>
-  <div class="footer-bot"><span>© 2026 Vokomoon.pk — All rights reserved.</span><span>Made with ❤️ in Pakistan 🇵🇰</span></div>
+  <div class="footer-bot"><span>© 2026 Vokomoon.com — All rights reserved.</span><span>Made with ❤️ in Pakistan 🇵🇰</span></div>
 </footer>
 
 <!-- WhatsApp -->
@@ -1672,16 +1787,16 @@ const DB = {
   questions: [],
   savedItems: [],
   cats: [
-    {id:'english',    name:'English',         icon:'📗', color:'#e8f5ee', show:true,  mcqs:0},
-    {id:'maths',      name:'Mathematics',     icon:'🔢', color:'#fff3e0', show:true,  mcqs:0},
-    {id:'science',    name:'General Science', icon:'🔬', color:'#e3f2fd', show:true,  mcqs:0},
-    {id:'computer',   name:'Computer Science',icon:'💻', color:'#f3e5f5', show:true,  mcqs:0},
-    {id:'gk',         name:'General Knowledge',icon:'🌍',color:'#fce4ec', show:true,  mcqs:0},
-    {id:'pakstudies', name:'Pakistan Studies', icon:'📜', color:'#e8f5e9', show:true,  mcqs:0},
-    {id:'chemistry',  name:'Chemistry',        icon:'⚗️', color:'#fff8e1', show:true,  mcqs:0},
-    {id:'biology',    name:'Biology',          icon:'🧬', color:'#e0f7fa', show:true,  mcqs:0},
-    {id:'islamic',    name:'Islamic Studies',  icon:'☪️', color:'#fbe9e7', show:true,  mcqs:0},
-    {id:'current',    name:'Current Affairs',  icon:'📰', color:'#ede7f6', show:true,  mcqs:0}
+    {id:'english',    name:'English',         icon:'📗', color:'#e8f5ee', show:true,  mcqs:0, is_department:false},
+    {id:'maths',      name:'Mathematics',     icon:'🔢', color:'#fff3e0', show:true,  mcqs:0, is_department:false},
+    {id:'science',    name:'General Science', icon:'🔬', color:'#e3f2fd', show:true,  mcqs:0, is_department:false},
+    {id:'computer',   name:'Computer Science',icon:'💻', color:'#f3e5f5', show:true,  mcqs:0, is_department:false},
+    {id:'gk',         name:'General Knowledge',icon:'🌍',color:'#fce4ec', show:true,  mcqs:0, is_department:false},
+    {id:'pakstudies', name:'Pakistan Studies', icon:'📜', color:'#e8f5e9', show:true,  mcqs:0, is_department:false},
+    {id:'chemistry',  name:'Chemistry',        icon:'⚗️', color:'#fff8e1', show:true,  mcqs:0, is_department:false},
+    {id:'biology',    name:'Biology',          icon:'🧬', color:'#e0f7fa', show:true,  mcqs:0, is_department:false},
+    {id:'islamic',    name:'Islamic Studies',  icon:'☪️', color:'#fbe9e7', show:true,  mcqs:0, is_department:false},
+    {id:'current',    name:'Current Affairs',  icon:'📰', color:'#ede7f6', show:true,  mcqs:0, is_department:false}
   ],
   subcats: [
     {id:'tenses',  parent:'english',   name:'Tenses',         mcqs:0},
@@ -1744,7 +1859,10 @@ async function loadDB() {
     if (d.videos)       DB.videos       = d.videos;
     if (d.notes)        DB.notes        = d.notes;
     if (d.questions)    DB.questions    = d.questions;
-    if (d.cats)         DB.cats         = d.cats;
+    if (d.cats) {
+      d.cats.forEach(c => { if (c.is_department === undefined) c.is_department = false; });
+      DB.cats = d.cats;
+    }
     if (d.subcats)      DB.subcats      = d.subcats;
     if (d.subsubcats)   DB.subsubcats   = d.subsubcats;
     if (d.users)        DB.users        = d.users;
@@ -1789,8 +1907,66 @@ async function init() {
   
   // Hide loading overlay
   if (overlay) overlay.style.display = 'none';
+
+  const { page, cat, sub, setNum, mcqId, postId, type, id } = getCurrentPageParams();
+  if (page !== 'home') {
+    navigateTo(page, { cat, sub, set: setNum, mcq: mcqId, post: postId, type, id });
+  } else {
+    go('home'); // ensures home page is active
+  }
 }
 window.addEventListener('DOMContentLoaded', init);
+// URL routing helpers (add at beginning of script)
+function getCurrentPageParams() {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get('page') || 'home';
+  const cat = params.get('cat');
+  const sub = params.get('sub');
+  const setNum = params.get('set');
+  const mcqId = params.get('mcq');
+  const postId = params.get('post');
+  const type = params.get('type');
+  const id = params.get('id');
+  return { page, cat, sub, setNum, mcqId, postId, type, id };
+}
+
+function buildUrl(page, extra = {}) {
+  if (page === 'home' && Object.keys(extra).length === 0) return 'index.php';
+  const params = new URLSearchParams();
+  if (page !== 'home') params.set('page', page);
+  for (let [k, v] of Object.entries(extra)) {
+    if (v !== undefined && v !== null && v !== '') params.set(k, v);
+  }
+  if (page === 'mcq' && extra.mcq && !extra.slug) {
+    const mcq = DB.mcqs.find(m => m.id === extra.mcq);
+    if (mcq && mcq.q) {
+      const slug = mcq.q.toLowerCase()
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, '-')
+        .substring(0, 80);
+      if (slug) params.set('name', slug);
+    }
+  }
+  const qs = params.toString();
+  return qs ? 'index.php?' + qs : 'index.php';
+}
+
+// Enhanced navigation – updates URL and calls your existing go()
+function navigateTo(page, extra = {}) {
+  const newUrl = buildUrl(page, extra);
+  history.pushState({}, '', newUrl);
+  // Call your existing go() function – it already hides/shows pages and renders content
+  go(page);
+  // After go() finishes, manually load extra parameters if needed (e.g., open category page)
+  if (page === 'cat' && extra.cat) openCatPage(extra.cat);
+  else if (page === 'set' && extra.cat && extra.set) openSetPage(extra.cat, extra.sub || null, parseInt(extra.set));
+  else if (page === 'mcq' && extra.mcq) openMcqDetail(extra.mcq);
+  else if (page === 'blogpost' && extra.post) openBlogPost(extra.post);
+  else if (page === 'content' && extra.type && extra.id) openContent(extra.type, extra.id);
+  else if (page === 'blog') renderBlogPage();
+  else if (page === 'saved') renderSavedPage();
+  // ... add other dynamic pages as needed
+}
 
 /* ══════ NAVIGATION ══════ */
 function go(page) {
@@ -1816,6 +1992,78 @@ function go(page) {
   }
 }
 
+// Returns true if MCQ is published (no schedule or schedule <= current time)
+function isMcqPublished(mcq) {
+  if (!mcq.scheduled_at) return true;
+  const scheduleTime = new Date(mcq.scheduled_at).getTime();
+  const now = new Date().getTime();
+  return scheduleTime <= now;
+}
+
+// Filter an array of MCQs to only those published
+function getPublishedMcqs(mcqs) {
+  return mcqs.filter(isMcqPublished);
+}
+
+/* ══════ Start Helper Methods ══════ */
+function updateMcqCountsMulti(mainCats, subCats, subsubCats) {
+  // For each main category
+  mainCats.forEach(mainId => {
+    const mainCat = DB.cats.find(c => c.id === mainId);
+    if (mainCat) mainCat.mcqs = (mainCat.mcqs || 0) + 1;
+  });
+
+  // For each sub category
+  subCats.forEach(subId => {
+    const subCat = DB.subcats.find(s => s.id === subId);
+    if (subCat) subCat.mcqs = (subCat.mcqs || 0) + 1;
+    // Also increment parent main category count (optional)
+    const parentMain = DB.cats.find(c => c.id === subCat?.parent);
+    if (parentMain) parentMain.mcqs = (parentMain.mcqs || 0) + 1;
+  });
+
+  // For each sub-sub category
+  subsubCats.forEach(sscId => {
+    const ssc = DB.subsubcats.find(x => x.id === sscId);
+    if (ssc) ssc.mcqs = (ssc.mcqs || 0) + 1;
+    // Also increment parent sub and main counts
+    const parentSub = DB.subcats.find(s => s.id === ssc?.parent);
+    if (parentSub) parentSub.mcqs = (parentSub.mcqs || 0) + 1;
+    const parentMain = DB.cats.find(c => c.id === ssc?.mainParent);
+    if (parentMain) parentMain.mcqs = (parentMain.mcqs || 0) + 1;
+  });
+}
+
+function mcqBelongsToCategory(mcq, catId, type) {
+  // type: 'main', 'sub', 'subsub'
+  if (type === 'main') {
+    if (mcq.main_cats) return mcq.main_cats.includes(catId);
+    else return mcq.cat === catId;           // backward compatibility
+  }
+  if (type === 'sub') {
+    if (mcq.sub_cats) return mcq.sub_cats.includes(catId);
+    else return false;
+  }
+  if (type === 'subsub') {
+    if (mcq.subsub_cats) return mcq.subsub_cats.includes(catId);
+    else return false;
+  }
+  return false;
+}
+
+function togglePassword() {
+  const input = document.getElementById("lockInp");
+  
+  if (input.type === "password") {
+    input.type = "text";
+  } else {
+    input.type = "password";
+  }
+}
+
+/* ══════ End Helper Methods ══════ */
+
+// Opens category page, counts MCQs (including sub-cats), and renders sub-categories and sets
 function openCatPage(catId) {
   const cat = DB.cats.find(c => c.id === catId);
   if (!cat) return;
@@ -1826,7 +2074,12 @@ function openCatPage(catId) {
   // Real MCQ count — include sub-cat and sub-sub-cat MCQs (fix: ander publish hon)
   const _subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
   const _sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-  const realMcqs = DB.mcqs.filter(m => m.cat === catId || _subIds.includes(m.cat) || _sscIds.includes(m.cat));
+  const realMcqsAll = DB.mcqs.filter(m => 
+    mcqBelongsToCategory(m, catId, 'main') ||
+    _subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+    _sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+  );
+  const realMcqs = getPublishedMcqs(realMcqsAll);
   const realCount = realMcqs.length;
   document.getElementById('cpMcqCnt').textContent = '📦 ' + realCount.toLocaleString() + ' MCQs';
 
@@ -1835,18 +2088,25 @@ function openCatPage(catId) {
   subEl.innerHTML = subs.length ? subs.map(s => {
     // Count: sub-cat direct MCQs + all sub-sub-cat MCQs under it
     const _sscIdsUnderSub = DB.subsubcats.filter(x => x.parent === s.id).map(x => x.id);
-    const subRealMcqs = DB.mcqs.filter(m => m.cat === s.id || _sscIdsUnderSub.includes(m.cat)).length;
+    const subAllMcqs = DB.mcqs.filter(m => 
+      mcqBelongsToCategory(m, s.id, 'sub')
+    );
+    const subRealMcqs = getPublishedMcqs(subAllMcqs).length;
     // Get sub-sub-cats under this sub
     const sscs = DB.subsubcats.filter(x => x.parent === s.id);
     const sscHtml = sscs.length ? `<div style="padding:0 18px 10px;display:flex;flex-wrap:wrap;gap:6px;">${sscs.map(x=>{
-      const xMcqs = DB.mcqs.filter(m => m.cat === x.id).length;
+      const xMcqs = getPublishedMcqs(DB.mcqs.filter(m => mcqBelongsToCategory(m, x.id, 'subsub'))).length;
       return `<span style="background:rgba(34,201,123,.1);border:1px solid rgba(34,201,123,.25);color:var(--forest2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();openSubSubCatPage('${catId}','${s.id}','${x.id}')">${x.name} (${xMcqs})</span>`;
     }).join('')}</div>` : '';
+    const sscId = sscs.length ? sscs[0].id : null; // for navigation if clicked on sub-cat without sub-sub-cats
     return `<div>
-      <div class="subcat-row" onclick="openSetPage('${catId}','${s.id}',1)">
-        <div class="subcat-l"><div class="subcat-dot"></div>${s.name}</div>
-        <div style="display:flex;align-items:center;gap:10px;"><span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span></div>
-      </div>${sscHtml}</div>`;
+    <div class="subcat-row" style="display:flex; align-items:center;gap:10px;">
+        <div class="subcat-l" onclick="navigateTo('set', {cat:'${catId}', sub:'${s.id}', set: 1}); return false;"><div class="subcat-dot"></div>${s.name}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+        <span class="subcat-cnt">${subRealMcqs.toLocaleString()} MCQs</span><span style="color:var(--text3);font-size:17px;">›</span>
+        </div>
+    </div>
+      <a href="${buildUrl('set', { cat: catId, sub: sscId, set: 1 })}" onclick="navigateTo('set', {cat:'${catId}', sub:'${sscId}', set:1}); return false;">${sscHtml}</a></div>`;
   }).join('') :
   '<div style="padding:18px;text-align:center;color:var(--text3);">No sub-categories yet.</div>';
 
@@ -1945,25 +2205,40 @@ function renderSetPage() {
 
   document.getElementById('setBread').innerHTML = `<span onclick="go('home')" style="color:var(--emlt);cursor:pointer;">Home</span> › <span onclick="openCatPage('${catId}')" style="color:var(--emlt);cursor:pointer;">${cat?.name||''}</span> › ${nm} › Set ${setNum}`;
   document.getElementById('setTitle').textContent = `Set ${setNum} — ${nm} MCQs`;
-  document.getElementById('setSeoUrl').textContent = `Vokomoon.pk/${catId}/${subcatId||'set'}/set-${setNum}`;
+  document.getElementById('setSeoUrl').textContent = `Vokomoon.com/${catId}/${subcatId||'set'}/set-${setNum}`;
 
   // Get ALL MCQs for this category/subcat (including sub-sub categories)
-  let allMcqs;
-  if (subcatId) {
-    if (ssc) {
-      // It's a sub-sub-cat — only its MCQs
-      allMcqs = DB.mcqs.filter(m => m.cat === subcatId);
-    } else {
-      // It's a sub-cat — include sub-cat MCQs + any sub-sub-cat MCQs under it
-      const sscIds = DB.subsubcats.filter(x => x.parent === subcatId).map(x => x.id);
-      allMcqs = DB.mcqs.filter(m => m.cat === subcatId || sscIds.includes(m.cat));
-    }
+ let allMcqsRaw;
+if (subcatId) {
+  // Check if subcatId is a sub-category or sub-sub-category
+  const isSub = DB.subcats.some(s => s.id === subcatId);
+  const isSubSub = DB.subsubcats.some(x => x.id === subcatId);
+  
+  if (isSubSub) {
+    // sub-sub category: MCQs where subsub_cats includes this id
+    allMcqsRaw = DB.mcqs.filter(m => mcqBelongsToCategory(m, subcatId, 'subsub'));
+  } else if (isSub) {
+    // sub category: MCQs where sub_cats includes this id OR any sub-sub under it
+    const sscIds = DB.subsubcats.filter(x => x.parent === subcatId).map(x => x.id);
+    allMcqsRaw = DB.mcqs.filter(m => 
+      mcqBelongsToCategory(m, subcatId, 'sub') ||
+      sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+    );
   } else {
-    // Main cat — include direct MCQs + sub-cat MCQs + sub-sub-cat MCQs
-    const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
-    const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
-    allMcqs = DB.mcqs.filter(m => m.cat === catId || subIds.includes(m.cat) || sscIds.includes(m.cat));
+    // fallback: treat as main or nothing
+    allMcqsRaw = [];
   }
+} else {
+  // Main category: all MCQs belonging to this main cat (including its sub & sub-sub)
+  const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
+  const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
+  allMcqsRaw = DB.mcqs.filter(m => 
+    mcqBelongsToCategory(m, catId, 'main') ||
+    subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+    sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+  );
+}
+  const allMcqs = getPublishedMcqs(allMcqsRaw);
   // 1 Set = 100 MCQs (10 sections x 10 MCQs)
   const mcqsPerSet2 = 100;
   const perSection = 10;
@@ -1978,18 +2253,25 @@ function renderSetPage() {
   const totalSets = Math.max(Math.ceil(totalMcqs / mcqsPerSet2), 1);
   // How many sections are filled in this set
   const thisSectionCount = Math.max(Math.ceil(setMcqs2.length / perSection), setMcqs2.length > 0 ? 1 : 0);
-  document.getElementById('setSubt').textContent = setMcqs2.length + ' MCQs in this set · ' + thisSectionCount + ' sections · 10 per section';
+  document.getElementById('setSubt').textContent = setMcqs2.length + ' MCQs in this set · ' + thisSectionCount + ' pages · 10 per section';
 
   // Build section tabs (only for this set's sections)
   const tabsEl = document.getElementById('sectionTabs');
+  const tabsEl2 = document.getElementById('sectionTabs2');
   if (tabsEl) {
     tabsEl.innerHTML = '';
+    tabsEl2.innerHTML = '';
     for (let s = 1; s <= thisSectionCount; s++) {
       const btn = document.createElement('button');
       btn.className = 'sec-tab' + (s === curSetSection ? ' active' : '');
-      btn.textContent = 'Section ' + s;
+      btn.textContent = 'Page ' + s;
       btn.onclick = (function(sec){ return function(){ goToSection(sec); }; })(s);
+      const btn2 = document.createElement('button');
+      btn2.className = 'sec-tab' + (s === curSetSection ? ' active' : '');
+      btn2.textContent = 'Page ' + s;
+      btn2.onclick = (function(sec){ return function(){ goToSection(sec); }; })(s);
       tabsEl.appendChild(btn);
+      tabsEl2.appendChild(btn2);
     }
   }
 
@@ -2018,13 +2300,19 @@ function renderSetPage() {
       return `<div class="iq-card" id="iqCard_${m.id}">
         <div style="display:flex;align-items:flex-start;gap:0;margin-bottom:10px;">
           <span class="iq-num">${qNum}</span>
-          <div class="iq-q" style="margin-bottom:0;flex:1;">${m.q}</div>
+          <div class="iq-q" style="margin-bottom:0;flex:1;">
+            <a href="${buildUrl('mcq', { mcq: m.id })}" 
+              target="_blank" 
+              style="color:inherit; text-decoration:none;"
+              onclick="event.stopPropagation();">
+              ${m.q}
+            </a>
+          </div>
           ${saveBtnHtml('mcq',m.id,m.q,m.catName||m.cat,"openMcqDetail('"+m.id+"',0)")}
         </div>
         <div class="iq-body-row">
           <div class="iq-opts" id="iqOpts_${m.id}">${optsHtml}</div>
           <div class="iq-side-result" id="iqSide_${m.id}">
-            <div class="iq-result" id="iqRes_${m.id}"></div>
             <div class="iq-exp" id="iqExp_${m.id}">${m.exp ? '<b>📘 Explanation:</b> ' + m.exp : ''}</div>
           </div>
         </div>
@@ -2038,6 +2326,7 @@ function renderSetPage() {
   }
   document.getElementById('setPag').innerHTML = '';
   go('setpage');
+  renderSetCategorySidebar();
 }
 
 function goToSection(sec) {
@@ -2067,24 +2356,8 @@ function selectIQOpt(mcqId, optIdx, correctIdx) {
     if (card) { card.classList.remove('answered-wrong'); card.classList.add('answered-correct'); }
 
     // Show "Correct!" message for 2 seconds
-    const resEl = document.getElementById('iqRes_' + mcqId);
     const sideEl = document.getElementById('iqSide_' + mcqId);
     if (sideEl) sideEl.classList.add('show');
-    if (resEl) {
-      resEl.className = 'iq-result show res-correct';
-      resEl.innerHTML = '✅ Correct Answer!';
-      setTimeout(() => {
-        resEl.className = 'iq-result';
-        resEl.innerHTML = '';
-        // After hiding message, check if explanation exists — if yes keep panel open
-        const m = curMcqList.find(x => x.id === mcqId);
-        const expEl = document.getElementById('iqExp_' + mcqId);
-        if (!(m && m.exp && m.exp.trim())) {
-          // No explanation — hide side panel too
-          if (sideEl) sideEl.classList.remove('show');
-        }
-      }, 2000);
-    }
 
     // Show explanation only if admin wrote one
     const expEl = document.getElementById('iqExp_' + mcqId);
@@ -2106,18 +2379,8 @@ function selectIQOpt(mcqId, optIdx, correctIdx) {
       optsEl.querySelectorAll('.iq-opt').forEach(o => o.classList.remove('opt-sel','opt-wrong'));
       thisOpt.classList.add('opt-wrong');
       // Show "Wrong!" message briefly
-      const resEl = document.getElementById('iqRes_' + mcqId);
       const sideEl = document.getElementById('iqSide_' + mcqId);
       if (sideEl) sideEl.classList.add('show');
-      if (resEl) {
-        resEl.className = 'iq-result show res-wrong';
-        resEl.innerHTML = '❌ Wrong Answer!';
-      }
-      setTimeout(() => {
-        thisOpt.classList.remove('opt-wrong');
-        if (resEl) { resEl.className = 'iq-result'; resEl.innerHTML = ''; }
-        if (sideEl) sideEl.classList.remove('show');
-      }, 2000);
     }
   }
 }
@@ -2225,7 +2488,7 @@ function openMcqDetail(mcqId, idx=0) {
   document.getElementById('mcqBread').innerHTML = `<span onclick="go('home')" style="color:var(--em);cursor:pointer;">Home</span> › <span onclick="openCatPage('${m.cat}')" style="color:var(--em);cursor:pointer;">${cat?.name||m.cat}</span> › Q.${curMcqIdx+1}`;
   document.getElementById('mcqNum').textContent = 'Q.' + (curMcqIdx+1);
   document.getElementById('mcqQ').textContent = m.q;
-  document.getElementById('mcqSeoUrl').textContent = 'Vokomoon.pk/' + m.cat + '/' + m.q.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,'-').substring(0,50);
+  document.getElementById('mcqSeoUrl').textContent = 'Vokomoon.com/' + m.cat + '/' + m.q.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,'-').substring(0,50);
   document.getElementById('mcqProgress').textContent = 'Q.'+(curMcqIdx+1)+' of '+curMcqList.length;
   // Support HTML explanations (rich text) and plain text
   const expEl = document.getElementById('mcqExpTxt');
@@ -2267,44 +2530,73 @@ function mcqPrev() { if(curMcqIdx>0){curMcqIdx--;openMcqDetail(curMcqList[curMcq
 
 /* ══════ HOME RENDERS ══════ */
 function renderHomeCats() {
-  const el = document.getElementById('homeCatGrid');
-  if (!el) return;
-  // Support both boolean true and string 'yes' for show
-  const shown = DB.cats.filter(c => c.show === true || c.show === 'yes');
-  if (!shown.length) {
-    el.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center;">Koi category nahi. Admin panel se add karein.</div>';
-    const hc = document.getElementById('heroCatCount');
-    if (hc) hc.textContent = '0';
-    return;
+  const allCats = DB.cats.filter(c => c.show === true || c.show === 'yes');
+  const normalCats = allCats.filter(c => !c.is_department);
+  const departmentCats = allCats.filter(c => c.is_department);
+
+  // Render “All Categories” (existing grid)
+  const normalGrid = document.getElementById('homeCatGrid');
+  if (normalGrid) {
+    if (!normalCats.length) {
+      normalGrid.innerHTML = '<div style="padding:20px;">Koi category nahi.</div>';
+    } else {
+      normalGrid.innerHTML = normalCats.map(c => {
+        const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
+        const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
+        const realMcqCnt = DB.mcqs.filter(m => 
+          mcqBelongsToCategory(m, c.id, 'main') ||
+          subIds.some(subId => mcqBelongsToCategory(m, subId, 'sub')) ||
+          sscIds.some(sscId => mcqBelongsToCategory(m, sscId, 'subsub'))
+        ).length;
+        const url = buildUrl('cat', { cat: c.id });
+        return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
+          <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
+          <div class="cat-arr">›</div>
+        </a>`;
+      }).join('');
+    }
   }
-  el.innerHTML = shown.map(c => {
-    const _subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
-    const _sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
-    const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || _subIds.includes(m.cat) || _sscIds.includes(m.cat)).length;
-    return `<div class="cat-card" onclick="openCatPage('${c.id}')">
-      <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
-      <div class="cat-name">${c.name}</div>
-      <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
-      <div class="cat-arr">›</div>
-    </div>`;
-  }).join('');
-  const hc = document.getElementById('heroCatCount');
-  if (hc) hc.textContent = shown.length;
+
+  // Render “All Departments” section
+  const deptGrid = document.getElementById('homeDeptGrid');
+  const deptSection = document.getElementById('homeDeptSec');
+  if (deptGrid && deptSection) {
+    if (!departmentCats.length) {
+      deptSection.style.display = 'none';
+    } else {
+      deptSection.style.display = 'block';
+      deptGrid.innerHTML = departmentCats.map(c => {
+        const subIds = DB.subcats.filter(s => s.parent === c.id).map(s => s.id);
+        const sscIds = DB.subsubcats.filter(x => x.mainParent === c.id).map(x => x.id);
+        const realMcqCnt = DB.mcqs.filter(m => m.cat === c.id || subIds.includes(m.cat) || sscIds.includes(m.cat)).length;
+        const url = buildUrl('cat', { cat: c.id });
+        return `<a href="${url}" class="cat-card" style="display:block; text-decoration:none;" onclick="navigateTo('cat', {cat:'${c.id}'}); return false;">
+          <div class="cat-icon" style="background:${c.color||'#e8f5ee'};">${c.icon||'📚'}</div>
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-count">${realMcqCnt.toLocaleString()} MCQs</div>
+          <div class="cat-arr">›</div>
+        </a>`;
+      }).join('');
+    }
+  }
+
+  document.getElementById('heroCatCount').textContent = allCats.length;
 }
 
+/* ====== Home MCQs ====== */
 function renderHomeMcqs() {
   const el = document.getElementById('homeMcqList');
   if (!el) return;
-  // Latest first — sort by timestamp then id descending
-  const sorted = [...DB.mcqs].sort((a,b) => {
-    const ta = a.ts || a.id || 0; const tb = b.ts || b.id || 0;
-    return String(tb).localeCompare(String(ta));
-  });
-  const all = sorted.length ? [...sorted, ...DB.sampleMcqs].slice(0,6) : DB.sampleMcqs.slice(0,6);
-  if (!all.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);">No MCQs yet.</div>'; return; }
+  const published = getPublishedMcqs(DB.mcqs);
+  const sorted = [...published].sort((a,b) => (b.ts||b.id||0) - (a.ts||a.id||0));
+  const all = sorted.slice(0,6);
+  if (!all.length) { el.innerHTML = '<div>No MCQs yet.</div>'; return; }
   el.innerHTML = all.map((m,i) => {
     const cat = DB.cats.find(c => c.id === m.cat);
-    return `<div class="mcq-card" onclick="openMcqFromHome(${i})">
+    const url = buildUrl('mcq', { mcq: m.id });
+    return `<a href="${url}" class="mcq-card" style="display:flex; text-decoration:none;" onclick="navigateTo('mcq', {mcq:'${m.id}'}, {name: '${m.slug}'}); return false;">
       <div class="mcq-num">#Q${i+1}</div>
       <div class="mcq-body">
         <div class="mcq-q">${m.q}</div>
@@ -2314,13 +2606,14 @@ function renderHomeMcqs() {
           <span class="mcq-views">👁 ${(m.views||0).toLocaleString()}</span>
         </div>
       </div>
-      ${saveBtnHtml('mcq',m.id,m.q,cat?.name||m.cat,"openMcqFromHome("+i+")")}
-    </div>`;
+      <div class="mcq-arr">›</div>
+    </a>`;
   }).join('');
 }
 
 function openMcqFromHome(idx) {
-  const sorted = [...DB.mcqs].sort((a,b) => {
+  const published = getPublishedMcqs(DB.mcqs);
+  const sorted = [...published].sort((a,b) => {
     const ta = a.ts || a.id || 0; const tb = b.ts || b.id || 0;
     return String(tb).localeCompare(String(ta));
   });
@@ -2396,24 +2689,99 @@ function openBlogPost(id) {
 function refreshNavCats() {
   const nav = document.getElementById('mainNav');
   if (!nav) return;
-  nav.querySelectorAll('.dyn-nav').forEach(b => b.remove());
+  nav.querySelectorAll('.dyn-nav').forEach(el => el.remove());
+
   const blogBtn = document.getElementById('navBlog');
   if (!blogBtn) return;
-  DB.cats.filter(c => c.show === true || c.show === 'yes').forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn dyn-nav';
-    btn.textContent = c.icon + ' ' + c.name;
-    btn.onclick = () => openCatPage(c.id);
-    blogBtn.insertAdjacentElement('beforebegin', btn);
-  });
+
+  const mainCats = DB.cats.filter(c => (c.show === true || c.show === 'yes') && !c.is_department);
+  for (const cat of mainCats) {
+    const subCats = DB.subcats.filter(sub => sub.parent === cat.id);
+    const container = document.createElement('div');
+    container.className = 'nav-item dyn-nav';
+
+    // ----- Main category link -----
+    const mainLink = document.createElement('a');
+    mainLink.className = 'nav-btn';
+    mainLink.textContent = cat.icon + ' ' + cat.name;
+    // Build real href
+    mainLink.href = buildUrl('cat', { cat: cat.id });
+    mainLink.classList.add('text-decoration-none');
+    mainLink.onclick = (e) => {
+      e.preventDefault();
+      navigateTo('cat', { cat: cat.id });
+      return false;
+    };
+    container.appendChild(mainLink);
+
+    if (subCats.length) {
+      const dropdownDiv = document.createElement('div');
+      dropdownDiv.className = 'dropdown-content';
+
+      for (const sub of subCats) {
+        const subsubs = DB.subsubcats.filter(ssc => ssc.parent === sub.id);
+        if (subsubs.length) {
+          // Subcategory with dropdown
+          const subWrap = document.createElement('div');
+          subWrap.className = 'sub-dropdown';
+
+          const subLink = document.createElement('a');
+          subLink.className = 'dropdown-item text-decoration-none';
+          subLink.textContent = sub.name;
+          subLink.href = buildUrl('set', { cat: cat.id, sub: sub.id, set: 1 });
+          subLink.onclick = (e) => {
+            e.preventDefault();
+            navigateTo('set', { cat: cat.id, sub: sub.id, set: 1 });
+            return false;
+          };
+          subWrap.appendChild(subLink);
+
+          const subsubDiv = document.createElement('div');
+          subsubDiv.className = 'sub-dropdown-content';
+          for (const ssc of subsubs) {
+            const sscLink = document.createElement('a');
+            sscLink.className = 'dropdown-item text-decoration-none';
+            sscLink.textContent = ssc.name;
+            sscLink.href = buildUrl('set', { cat: cat.id, sub: ssc.id, set: 1 });
+            sscLink.onclick = (e) => {
+              e.preventDefault();
+              navigateTo('set', { cat: cat.id, sub: ssc.id, set: 1 });
+              return false;
+            };
+            subsubDiv.appendChild(sscLink);
+          }
+          subWrap.appendChild(subsubDiv);
+          dropdownDiv.appendChild(subWrap);
+        } else {
+          // Simple subcategory
+          const subLink = document.createElement('a');
+          subLink.className = 'dropdown-item text-decoration-none';
+          subLink.textContent = sub.name;
+          subLink.href = buildUrl('set', { cat: cat.id, sub: sub.id, set: 1 });
+          subLink.onclick = (e) => {
+            e.preventDefault();
+            navigateTo('set', { cat: cat.id, sub: sub.id, set: 1 });
+            return false;
+          };
+          dropdownDiv.appendChild(subLink);
+        }
+      }
+      container.appendChild(dropdownDiv);
+    }
+    blogBtn.insertAdjacentElement('beforebegin', container);
+  }
 }
 
 function refreshFooterCats() {
   const el = document.getElementById('footerCatLinks');
   if (!el) return;
-  const shown = DB.cats.filter(c => c.show === true || c.show === 'yes').slice(0, 8);
-  el.innerHTML = shown.map(c =>
-    `<a onclick="openCatPage('${c.id}')">${c.icon} ${c.name}</a>`).join('');
+  const shown = DB.cats.filter(c => (c.show === true || c.show === 'yes') && !c.is_department).slice(0, 8);
+  el.innerHTML = shown.map(c => `
+    <a href="${buildUrl('cat', { cat: c.id })}" 
+       onclick="navigateTo('cat', { cat: '${c.id}' }); return false;">
+      ${c.icon} ${c.name}
+    </a>
+  `).join('');
 }
 
 /* ══════ CATEGORY SELECTS ══════ */
@@ -2449,6 +2817,63 @@ function refreshAllCatSelects() {
 
 /* ══════ ADMIN LOGIN ══════ */
 let admLoggedIn = false;
+let mainSelect, subSelect, subsubSelect;
+
+function initMultiCatSelectors() {
+  mainSelect = $('#mainCatSelect').select2({
+    placeholder: "Select one or more main categories",
+    allowClear: true
+  });
+  subSelect = $('#subCatSelect').select2({
+    placeholder: "Select sub‑categories (optional)",
+    allowClear: true
+  });
+  subsubSelect = $('#subsubCatSelect').select2({
+    placeholder: "Select sub‑sub‑categories (optional)",
+    allowClear: true
+  });
+
+  // Populate main categories
+  mainSelect.empty();
+  DB.cats.filter(c => !c.is_department && (c.show===true||c.show==='yes')).forEach(c => {
+    mainSelect.append(new Option(c.icon+' '+c.name, c.id, false, false));
+  });
+  mainSelect.trigger('change');
+
+  // When main categories change → load matching subcategories
+  mainSelect.on('change', function() {
+    const selectedMainIds = $(this).val() || [];
+    subSelect.prop('disabled', selectedMainIds.length === 0);
+    if (selectedMainIds.length === 0) {
+      subSelect.empty().append(new Option('— Pehle Main Category select karein —', ''));
+      subSelect.trigger('change');
+      return;
+    }
+
+    const subs = DB.subcats.filter(s => selectedMainIds.includes(s.parent));
+    subSelect.empty();
+    subs.forEach(s => {
+      subSelect.append(new Option(s.name, s.id, false, false));
+    });
+    subSelect.trigger('change');
+  });
+
+  // When subcategories change → load matching sub‑subcategories
+  subSelect.on('change', function() {
+    const selectedSubIds = $(this).val() || [];
+    subsubSelect.prop('disabled', selectedSubIds.length === 0);
+    if (selectedSubIds.length === 0) {
+      subsubSelect.empty().append(new Option('— Pehle Sub‑Category select karein —', ''));
+      return;
+    }
+
+    const subsubs = DB.subsubcats.filter(x => selectedSubIds.includes(x.parent));
+    subsubSelect.empty();
+    subsubs.forEach(ss => {
+      subsubSelect.append(new Option(ss.name, ss.id, false, false));
+    });
+  });
+}
 
 async function doAdmLogin() {
   const p = document.getElementById('lockInp').value;
@@ -2509,6 +2934,7 @@ function doAdmLogout() {
 }
 
 function admTab(t, el) {
+  initMultiCatSelectors()
   document.querySelectorAll('.adm-tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('active'));
   const pg = document.getElementById('admt-' + t);
@@ -2762,8 +3188,9 @@ function publishSingleMcq(n) {
   const expEl = document.getElementById('mcqExp'+n);
   const exp = expEl ? (expEl.innerHTML || '') : '';
   const set = parseInt(document.getElementById('mcqSet'+n)?.value)||1;
+  const scheduledAt = document.getElementById('mcqSched'+n)?.value || null;
   const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
+  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
   updateMcqCounts(pt);
   renderHomeMcqs(); renderHomeCats(); renderMcqTable(); updateDashStats();
   addToAllContent('mcq','❓','1 MCQ — '+pt.catName);
@@ -2777,33 +3204,90 @@ function publishSingleMcq(n) {
 
 // Publish Question #1 individually (uses shared PT selectors)
 function publishSingleMcqFirst() {
-  const pt = getPublishTarget('pt');
-  if (!pt) { toast('⚠️ Publish target select karein!','e'); return; }
+  // 1. Get selected categories from multi‑selects
+  const mainCats = mainSelect ? mainSelect.val() : [];
+  const subCats = subSelect ? subSelect.val() : [];
+  const subsubCats = subsubSelect ? subsubSelect.val() : [];
+
+  if (!mainCats || mainCats.length === 0) {
+    toast('⚠️ Kam se kam ek Main Category select karein!', 'e');
+    return;
+  }
+
+  // 2. Get question block elements
   const blk = document.getElementById('mcqBlk1');
   if (!blk) return;
+
   const qEl = document.getElementById('mcqQ1');
-  const q = qEl ? (qEl.innerText||'').trim() : '';
+  const q = qEl ? (qEl.innerText || '').trim() : '';
   const qHtml = qEl ? qEl.innerHTML.trim() : '';
-  if (!q) { toast('⚠️ Question likhein!','e'); qEl?.focus(); return; }
+  if (!q) {
+    toast('⚠️ Question likhein!', 'e');
+    qEl?.focus();
+    return;
+  }
+
+  // 3. Collect options and correct answer
   const optInputs = Array.from(blk.querySelectorAll('.opt-row input[type="text"]'));
   const opts = optInputs.map(inp => inp.value.trim() || 'Option');
   const radios = Array.from(blk.querySelectorAll('.opt-radio'));
   const correct = radios.findIndex(r => r.checked);
+  if (correct === -1) {
+    toast('⚠️ Correct option select karein!', 'e');
+    return;
+  }
+
+  // 4. Other MCQ fields
   const diff = document.getElementById('mcqDiff1')?.value || 'Easy';
   const expEl = document.getElementById('mcqExp1');
   const exp = expEl ? (expEl.innerHTML || '') : '';
-  const set = parseInt(document.getElementById('mcqSet1')?.value)||1;
-  const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-  DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml||q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
-  updateMcqCounts(pt);
-  renderHomeMcqs(); renderHomeCats(); renderMcqTable(); updateDashStats();
-  addToAllContent('mcq','❓','1 MCQ — '+pt.catName);
-  logAct('✏️','Question #1 published — '+pt.catName,'st-pub','Published');
-  if(qEl) qEl.innerHTML='';
-  if(expEl) expEl.innerHTML='';
-  optInputs.forEach(inp => inp.value='');
-  toast('✅ Question #1 "'+pt.catName+'" mein live ho gaya!','s');
-  saveDB(); renderAllContent();
+  const set = parseInt(document.getElementById('mcqSet1')?.value) || 1;
+  const scheduledAt = document.getElementById('mcqSched1')?.value || null;
+
+  // 5. Create unique ID and store MCQ
+  const id = 'm' + Date.now() + Math.random().toString(36).substr(2, 8);
+  DB.mcqs.push({
+    id,
+    main_cats: mainCats,
+    sub_cats: subCats,
+    subsub_cats: subsubCats,
+    q: qHtml || q,
+    opts,
+    correct,
+    diff,
+    exp,
+    set,
+    scheduled_at: scheduledAt,
+    date: new Date().toLocaleDateString(),
+    views: 0
+  });
+
+  // 6. Update counts for all selected categories
+  updateMcqCountsMulti(mainCats, subCats, subsubCats);
+
+  // 7. Refresh UI everywhere
+  renderHomeMcqs();
+  renderHomeCats();
+  renderMcqTable();
+  updateDashStats();
+  addToAllContent('mcq', '❓', '1 MCQ — ' + mainCats.map(cid => {
+    const cat = DB.cats.find(c => c.id === cid);
+    return cat ? cat.name : cid;
+  }).join(', '));
+  logAct('✏️', 'Question #1 published in ' + mainCats.length + ' main category(s)', 'st-pub', 'Published');
+
+  // 8. Clear form fields
+  if (qEl) qEl.innerHTML = '';
+  if (expEl) expEl.innerHTML = '';
+  optInputs.forEach(inp => inp.value = '');
+  // Reset multi‑selects (optional)
+  if (mainSelect) mainSelect.val(null).trigger('change');
+  if (subSelect) subSelect.val(null).trigger('change');
+  if (subsubSelect) subsubSelect.val(null).trigger('change');
+
+  toast('✅ MCQ successfully published in ' + mainCats.length + ' category(s)!', 's');
+  saveDB();
+  renderAllContent();
 }
 
 function addOpt(n) {
@@ -3071,8 +3555,9 @@ function publishMcqs() {
     const expEl = document.getElementById('mcqExp'+i);
     const exp = expEl ? (expEl.innerHTML || expEl.value || '') : '';
     const set = parseInt(document.getElementById('mcqSet'+i)?.value)||1;
+    const scheduledAt = document.getElementById('mcqSched'+i)?.value || null;
     const id = 'm' + Date.now() + Math.random().toString(36).substr(2,4);
-    DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml || q, opts, correct:correct>=0?correct:0, diff, exp, set, date:new Date().toLocaleDateString(), views:0});
+    DB.mcqs.push({id, cat:pt.catId, catName:pt.catName, q: qHtml || q, opts, correct:correct>=0?correct:0, diff, exp, set, scheduled_at: scheduledAt, date:new Date().toLocaleDateString(), views:0});
     // Update cat MCQ count
     updateMcqCounts(pt);
     count++;
@@ -3110,10 +3595,18 @@ function renderMcqTable() {
     return `<tr>
       <td style="color:var(--ad);">${String(i+1).padStart(3,'0')}</td>
       <td class="td-main" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.q.substring(0,55)}…</td>
-      <td><span class="chip-a">${catName}</span></td>
+      <td><span class="chip-a">
+        ${m.main_cats ? m.main_cats.map(cid => DB.cats.find(c=>c.id===cid)?.name).join(', ') : (DB.cats.find(c=>c.id===m.cat)?.name || m.cat)}
+      </span></td>
       <td><span class="diff-${m.diff==='Hard'?'h':m.diff==='Medium'?'m':'e'}">${m.diff}</span></td>
-      <td><span class="st st-pub">Published</span></td>
-      <td><input type="datetime-local" class="sched-inp"></td>
+      <td>
+        ${!m.scheduled_at || new Date(m.scheduled_at) <= new Date() 
+          ? '<span class="st st-pub">Published</span>' 
+          : '<span class="st st-sch">Scheduled</span>'}
+      </td>
+      <td style="font-size:11px;">
+        ${m.scheduled_at ? new Date(m.scheduled_at).toLocaleString() : '—'}
+      </td>
       <td><div style="display:flex;gap:5px;">
         <button class="ab ab-o" style="padding:4px 9px;font-size:11px;" onclick="openEditModal('mcq','${m.id}')">✏️ Edit</button>
         <button class="ab ab-d" style="padding:4px 9px;font-size:11px;" onclick="delMcq('${m.id}',this)">Del</button>
@@ -3311,6 +3804,7 @@ function addCategory() {
   const nameEl = document.getElementById('newCatName');
   const colorEl = document.getElementById('newCatColor');
   const showEl = document.getElementById('newCatShow');
+  const isDepartment = document.getElementById('newCatDepartment')?.checked || false;
 
   const name = nameEl ? nameEl.value.trim() : '';
   const color = colorEl ? colorEl.value : '#e8f5ee';
@@ -3331,7 +3825,7 @@ function addCategory() {
   const autoIcons = ['📚','📖','🎯','💡','🏆','📋','🔍','✏️','📊','🌟','💼','🔬','🌍','💻','⚡','🎓','📜','🧪','🧬','🌏'];
   const icon = autoIcons[DB.cats.length % autoIcons.length];
 
-  const newCat = {id, name, icon, color, show, mcqs: 0};
+  const newCat = {id, name, icon, color, show, mcqs: 0, is_department: isDepartment};
   DB.cats.push(newCat);
 
   // ✅ Update EVERY part of the website immediately
@@ -3511,6 +4005,13 @@ function editCat(id, type) {
         <option value="yes" ${item.show?'selected':''}>✅ Yes — Homepage par show ho</option>
         <option value="no" ${!item.show?'selected':''}>🔒 No — Hidden raho</option>
       </select>`;
+    html += `<label style="${L}">Is Department?</label>
+      <div style="margin-bottom:12px;">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="ewCatDepartment" ${item.is_department ? 'checked' : ''}> 
+          <span style="font-size:13px;">Show in “All Departments” section on homepage</span>
+        </label>
+      </div>`;
   }
 
   document.getElementById('ewBody').innerHTML = html;
@@ -3967,9 +4468,9 @@ function liveSearch(q) {
   if (!q || q.length < 2) { drop.style.display = 'none'; return; }
   const results = [];
   // Search MCQs
-  DB.mcqs.filter(m => m.q.toLowerCase().includes(q)).slice(0,5).forEach(m => {
+  getPublishedMcqs(DB.mcqs).filter(m => m.q.toLowerCase().includes(q)).slice(0,5).forEach(m => {
     const cat = DB.cats.find(c => c.id === m.cat);
-    results.push({ type:'mcq', icon:'❓', bg:'rgba(34,201,123,.1)', title: m.q.substring(0,70)+(m.q.length>70?'…':''), sub: (cat?.name||m.cat)+' · '+m.diff, action:`openMcqDetail('${m.id}',0)` });
+    results.push({ type:'mcq', icon:'❓', bg:'rgba(34,201,123,.1)', title: m.q.substring(0,70)+(m.q.length>70?'…':''), sub: (cat?.name||m.cat)+' · '+m.diff, action:`navigateTo('mcq', { mcq: '${m.id}' }); return false;` });
   });
   // Search categories
   DB.cats.filter(c => c.name.toLowerCase().includes(q)).slice(0,3).forEach(c => {
@@ -4141,6 +4642,64 @@ function expCmd(n, cmd, val) {
   if (!el) return;
   el.focus();
   document.execCommand(cmd, false, val||null);
+}
+
+// Insert a table at cursor position
+function insertTableInExp(n) {
+  let rows = prompt('Number of rows (1-10):', '3');
+  if (!rows) return;
+  rows = parseInt(rows);
+  if (isNaN(rows) || rows < 1) rows = 1;
+  if (rows > 10) rows = 10;
+
+  let cols = prompt('Number of columns (1-10):', '3');
+  if (!cols) return;
+  cols = parseInt(cols);
+  if (isNaN(cols) || cols < 1) cols = 1;
+  if (cols > 10) cols = 10;
+
+  let tableHtml = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; margin:10px 0; width:100%;">';
+  for (let i = 0; i < rows; i++) {
+    tableHtml += '<tr>';
+    for (let j = 0; j < cols; j++) {
+      tableHtml += '<td style="border:1px solid #ccc; padding:8px;">&nbsp;</td>';
+    }
+    tableHtml += '</tr>';
+  }
+  tableHtml += '</table>';
+
+  const editor = document.getElementById('mcqExp' + n);
+  if (!editor) return;
+  editor.focus();
+
+  // Use execCommand with insertHTML (supported in modern browsers)
+  if (document.queryCommandSupported('insertHTML')) {
+    document.execCommand('insertHTML', false, tableHtml);
+  } else {
+    // Fallback: insert at cursor using selection range
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const fragment = range.createContextualFragment(tableHtml);
+      range.insertNode(fragment);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      editor.innerHTML += tableHtml;
+    }
+  }
+}
+
+// Apply text color to selected text (or at cursor)
+function applyTextColorToExp(n) {
+  let color = prompt('Enter color (name or hex):', '#22C97B');
+  if (!color) return;
+  const editor = document.getElementById('mcqExp' + n);
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('foreColor', false, color);
 }
 
 /* ══════ ARTICLE IMAGE HANDLER ══════ */
@@ -4361,7 +4920,7 @@ function openEditModal(type, id) {
         <input type="radio" name="ewCorr" value="${i}" ${i===item.correct?'checked':''} style="width:18px;height:18px;accent-color:#22C97B;cursor:pointer;flex-shrink:0;">
       </div>`).join('');
     html = `<label style="${L}">Category</label><select id="ew1" style="${S}cursor:pointer;"><option value="">Select…</option>${catO}</select>
-<label style="${L}">Difficulty</label><select id="ew2" style="${S}cursor:pointer;"><option ${item.diff==='Easy'?'selected':''}>Easy</option><option ${item.diff==='Medium'?'selected':''}>Medium</option><option ${item.diff==='Hard'?'selected':''}>Hard</option></select>
+<label style="${L}">Schedule (Optional)</label><input type="datetime-local" id="ewSched" style="${S}" value="${item.scheduled_at ? item.scheduled_at.slice(0,16) : ''}">
 <label style="${L}">Question *</label><textarea id="ew3" style="${S}resize:vertical;min-height:80px;">${eh(item.q||'')}</textarea>
 <label style="${L}">Options <span style="font-weight:400;color:#6b9b82;">(⭕ = Correct Answer)</span></label>${opts}
 <label style="${L}">Explanation</label><textarea id="ew4" style="${S}resize:vertical;min-height:60px;">${eh(item.exp||'')}</textarea>`;
@@ -4404,6 +4963,8 @@ function saveEW() {
       item.icon = document.getElementById('ewCatIcon')?.value.trim() || item.icon;
       item.color = document.getElementById('ewCatColor')?.value || item.color;
       const showVal = document.getElementById('ewCatShow')?.value;
+      const isDepartment = document.getElementById('ewCatDepartment')?.checked || false;
+      item.is_department = isDepartment;
       item.show = (showVal === 'yes');
       renderHomeCats(); refreshNavCats(); refreshFooterCats();
     } else if (catType === 'sub') {
@@ -4440,6 +5001,13 @@ function saveEW() {
   } else if (type === 'mcq') {
     const q=document.getElementById('ew3')?.value.trim(); if(!q){toast('⚠️ Question likhein!','e');return;}
     const catName=document.getElementById('ew1')?.value;
+    const schedValue = document.getElementById('ewSched')?.value;
+    if (schedValue) {
+      // Convert to proper datetime format (Y-m-d\TH:i)
+      item.scheduled_at = schedValue;
+    } else {
+      item.scheduled_at = null;
+    }
     const catObj=DB.cats.find(c=>c.name===catName);
     item.q=q; item.catName=catName; item.cat=catObj?catObj.id:item.cat;
     item.diff=document.getElementById('ew2')?.value||item.diff;
@@ -4613,6 +5181,128 @@ function delAllContent(type, id) {
   saveDB();
   renderAllContent();
   toast('🗑️ Delete ho gaya!','e');
+}
+
+function renderSetCategorySidebar() {
+  const container = document.getElementById('setCategoriesSidebar');
+  if (!container) return;
+
+  // Helper: count MCQs for a category (main, sub, sub-sub)
+  function countMcqs(catId, type, parentId = null) {
+    if (type === 'main') {
+      const subIds = DB.subcats.filter(s => s.parent === catId).map(s => s.id);
+      const sscIds = DB.subsubcats.filter(x => x.mainParent === catId).map(x => x.id);
+      const allIds = [catId, ...subIds, ...sscIds];
+      return DB.mcqs.filter(m => allIds.includes(m.cat)).length;
+    } else if (type === 'sub') {
+      const sscIds = DB.subsubcats.filter(x => x.parent === catId).map(x => x.id);
+      return DB.mcqs.filter(m => m.cat === catId || sscIds.includes(m.cat)).length;
+    } else { // sub-sub
+      return DB.mcqs.filter(m => m.cat === catId).length;
+    }
+  }
+
+  // Determine active IDs for highlighting
+  const activeMain = curSetCatId;
+  const activeSub = curSetSubId;
+  const activeSSC = (() => {
+    const ssc = DB.subsubcats.find(x => x.id === curSetSubId);
+    return ssc ? curSetSubId : null;
+  })();
+
+  let html = '<div class="category-tree">';
+  for (const cat of DB.cats) {
+    const subcats = DB.subcats.filter(s => s.parent === cat.id);
+    const mcqCount = countMcqs(cat.id, 'main');
+    const isActiveMain = (activeMain === cat.id && !activeSub && !activeSSC);
+    html += `
+      <div class="cat-tree-item main-cat" data-main-id="${cat.id}">
+        <div class="cat-tree-row">
+          <span class="cat-toggle" data-type="main" data-id="${cat.id}">➕</span>
+          <span class="cat-name-link ${isActiveMain ? 'active-cat' : ''}" data-type="main" data-id="${cat.id}">${cat.icon} ${cat.name}</span>
+          <span class="cat-count">(${mcqCount})</span>
+        </div>
+        <div class="cat-children" data-parent="${cat.id}" style="display:none;">`;
+    for (const sub of subcats) {
+      const subMcqCount = countMcqs(sub.id, 'sub');
+      const subsubs = DB.subsubcats.filter(x => x.parent === sub.id);
+      const hasSubsub = subsubs.length > 0;
+      const isActiveSub = (activeSub === sub.id && !activeSSC);
+      html += `
+        <div class="cat-tree-item sub-cat" data-sub-id="${sub.id}" style="margin-left:20px;">
+          <div class="cat-tree-row">
+            ${hasSubsub ? `<span class="cat-toggle" data-type="sub" data-id="${sub.id}" data-parent-main="${cat.id}">➕</span>` : '<span style="width:20px;"></span>'}
+            <span class="cat-name-link ${isActiveSub ? 'active-cat' : ''}" data-type="sub" data-main="${cat.id}" data-sub="${sub.id}">📌 ${sub.name}</span>
+            <span class="cat-count">(${subMcqCount})</span>
+          </div>
+          <div class="cat-children" data-parent-sub="${sub.id}" style="display:none; margin-left:20px;">`;
+      for (const ssc of subsubs) {
+        const sscMcqCount = countMcqs(ssc.id, 'subsub');
+        const isActiveSSC = (activeSSC === ssc.id);
+        html += `
+          <div class="cat-tree-item subsub-cat" data-ssc-id="${ssc.id}" style="margin-left:20px;">
+            <div class="cat-tree-row">
+              <span style="width:20px;"></span>
+              <span class="cat-name-link ${isActiveSSC ? 'active-cat' : ''}" data-type="subsub" data-main="${cat.id}" data-sub="${sub.id}" data-ssc="${ssc.id}">🔹 ${ssc.name}</span>
+              <span class="cat-count">(${sscMcqCount})</span>
+            </div>
+          </div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+
+  // ----- attach event listeners -----
+  // toggle for main categories
+  document.querySelectorAll('.cat-toggle[data-type="main"]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const mainId = btn.dataset.id;
+      const childrenDiv = document.querySelector(`.cat-children[data-parent="${mainId}"]`);
+      if (childrenDiv) {
+        const isVisible = childrenDiv.style.display !== 'none';
+        childrenDiv.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? '➕' : '➖';
+      }
+    };
+  });
+  // toggle for sub categories
+  document.querySelectorAll('.cat-toggle[data-type="sub"]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const subId = btn.dataset.id;
+      const childrenDiv = document.querySelector(`.cat-children[data-parent-sub="${subId}"]`);
+      if (childrenDiv) {
+        const isVisible = childrenDiv.style.display !== 'none';
+        childrenDiv.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? '➕' : '➖';
+      }
+    };
+  });
+
+  // navigation on category name clicks
+  document.querySelectorAll('.cat-name-link').forEach(link => {
+    link.onclick = (e) => {
+      e.stopPropagation();
+      const type = link.dataset.type;
+      if (type === 'main') {
+        const mainId = link.dataset.id;
+        openCatPage(mainId);
+      } else if (type === 'sub') {
+        const mainId = link.dataset.main;
+        const subId = link.dataset.sub;
+        openSetPage(mainId, subId, 1);
+      } else if (type === 'subsub') {
+        const mainId = link.dataset.main;
+        const subId = link.dataset.sub;
+        const sscId = link.dataset.ssc;
+        openSubSubCatPage(mainId, subId, sscId);
+      }
+    };
+  });
 }
 
 </script>
